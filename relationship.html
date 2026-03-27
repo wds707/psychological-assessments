@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>亲密关系深度测评</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{font-family:'Noto Sans SC',sans-serif;background:#0a0a14;color:#fff;min-height:100vh;overflow-x:hidden}
+        #particles-canvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none}
+        .container{position:relative;z-index:1;max-width:900px;margin:0 auto;padding:40px 20px}
+        .page{display:none;animation:fadeIn .5s ease}
+        .page.active{display:block}
+        @keyframes fadeIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+        .home-wrap{text-align:center;padding-top:60px}
+        .top-badge{display:inline-block;background:linear-gradient(135deg,#fb7185,#e11d48);padding:8px 24px;border-radius:30px;font-size:.95rem;font-weight:600;margin-bottom:30px;box-shadow:0 4px 15px rgba(251,113,133,.35)}
+        .main-title{font-family:'Noto Serif SC',serif;font-size:3.5rem;background:linear-gradient(135deg,#fda4af,#fb7185,#e11d48);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;filter:drop-shadow(0 0 25px rgba(251,113,133,.4));line-height:1.2;margin-bottom:16px}
+        .sub-title{font-size:1.25rem;color:#ccc;margin-bottom:12px}
+        .description{font-size:1rem;color:#999;line-height:1.8;max-width:680px;margin:0 auto 28px}
+        .feature-tags{display:flex;justify-content:center;gap:16px;flex-wrap:wrap;margin-bottom:40px}
+        .ftag{background:rgba(251,113,133,.1);border:1px solid rgba(251,113,133,.3);padding:8px 20px;border-radius:20px;font-size:.9rem;color:#fb7185}
+        .pw-box{max-width:460px;margin:0 auto 50px;background:rgba(20,20,30,.7);backdrop-filter:blur(10px);border:2px solid rgba(251,113,133,.35);border-radius:20px;padding:45px;box-shadow:0 0 60px rgba(251,113,133,.25)}
+        .pw-label{text-align:center;color:#fb7185;font-size:1.05rem;margin-bottom:16px;display:block}
+        .pw-input{width:100%;padding:16px;font-size:1.2rem;background:rgba(10,10,20,.9);border:2px solid #333;border-radius:12px;color:#fb7185;text-align:center;margin-bottom:22px;transition:all .3s}
+        .pw-input:focus{outline:none;border-color:#fb7185;box-shadow:0 0 20px rgba(251,113,133,.35)}
+        .pw-input::placeholder{color:rgba(251,113,133,.3)}
+        .btn-start{width:100%;padding:16px;font-size:1.1rem;font-weight:700;border:none;border-radius:12px;cursor:pointer;background:linear-gradient(135deg,#fb7185,#e11d48);color:#fff;letter-spacing:2px;transition:all .3s;box-shadow:0 6px 20px rgba(251,113,133,.4)}
+        .btn-start:hover{transform:translateY(-3px);box-shadow:0 10px 30px rgba(251,113,133,.55)}
+        .fc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:20px;padding:0 10px}
+        .fc-card{background:rgba(20,20,30,.6);backdrop-filter:blur(8px);border:1px solid rgba(251,113,133,.2);border-radius:16px;padding:28px 22px;text-align:center;transition:all .3s}
+        .fc-card:hover{transform:translateY(-5px);border-color:rgba(251,113,133,.5);box-shadow:0 10px 30px rgba(251,113,133,.2)}
+        .fc-icon{font-size:2.5rem;margin-bottom:14px}
+        .fc-title{font-size:1.1rem;font-weight:600;color:#fb7185;margin-bottom:8px}
+        .fc-desc{font-size:.9rem;color:#999;line-height:1.6}
+        h1.qt{font-family:'Noto Serif SC',serif;font-size:2rem;color:#fb7185;text-align:center;margin-bottom:8px;text-shadow:0 0 25px rgba(251,113,133,.4)}
+        .qt-sub{text-align:center;color:#999;margin-bottom:25px}
+        .prog-bar{height:8px;background:rgba(255,255,255,.1);border-radius:10px;margin-bottom:28px;overflow:hidden}
+        .prog-fill{height:100%;background:linear-gradient(90deg,#fb7185,#e11d48);border-radius:10px;transition:width .5s}
+        .q-card{background:rgba(20,20,30,.8);border:2px solid rgba(251,113,133,.3);border-radius:20px;padding:38px;margin-bottom:24px}
+        .q-num{display:inline-block;background:linear-gradient(135deg,#fb7185,#e11d48);padding:5px 16px;border-radius:15px;font-size:.85rem;margin-bottom:18px}
+        .q-text{font-size:1.35rem;line-height:1.8;color:#fff;margin-bottom:28px}
+        .options{display:grid;gap:14px}
+        .opt{background:rgba(255,255,255,.04);border:2px solid rgba(251,113,133,.2);border-radius:12px;padding:18px 22px;cursor:pointer;font-size:1.05rem;transition:all .3s}
+        .opt:hover{background:rgba(251,113,133,.1);border-color:#fb7185;transform:translateX(5px)}
+        .opt.selected{background:rgba(251,113,133,.2);border-color:#fb7185;box-shadow:0 0 18px rgba(251,113,133,.3)}
+        .nav-btns{display:flex;gap:14px;margin-top:22px}
+        .btn-nav{flex:1;padding:14px;font-size:1rem;background:rgba(251,113,133,.1);border:2px solid #fb7185;color:#fb7185;border-radius:10px;cursor:pointer;font-weight:600;transition:all .3s}
+        .btn-nav:hover{background:#fb7185;color:#fff}
+        .res-header{text-align:center;padding:30px;background:rgba(20,20,30,.8);border:2px solid rgba(251,113,133,.3);border-radius:20px;margin-bottom:28px}
+        .res-title{font-family:'Noto Serif SC',serif;font-size:2.5rem;color:#fb7185;margin-bottom:8px}
+        .res-sub{font-size:1.1rem;color:#999;margin-bottom:18px}
+        .score-big{font-size:3.5rem;font-weight:700;color:#fb7185;text-shadow:0 0 30px rgba(251,113,133,.6)}
+        .score-lbl{color:#aaa;font-size:1rem;margin-top:6px}
+        .res-section{background:rgba(20,20,30,.8);border:2px solid rgba(251,113,133,.3);border-radius:20px;padding:35px;margin-bottom:26px}
+        .sec-title{font-family:'Noto Serif SC',serif;font-size:1.7rem;color:#fb7185;margin-bottom:22px;display:flex;align-items:center;gap:10px}
+        .dim-item{background:rgba(255,255,255,.03);padding:20px;border-radius:14px;border-left:4px solid #fb7185;margin-bottom:18px}
+        .dim-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+        .dim-name{font-size:1.1rem;font-weight:600}
+        .dim-type{font-size:1rem;color:#fb7185;font-weight:600}
+        .dim-score{font-size:1.8rem;font-weight:700;color:#fb7185;margin:6px 0}
+        .dim-desc{color:#b0b0b0;font-size:.95rem;line-height:1.7;margin-bottom:12px}
+        .pb{height:9px;background:rgba(255,255,255,.08);border-radius:8px;overflow:hidden}
+        .pb-fill{height:100%;background:linear-gradient(90deg,#fb7185,#e11d48);border-radius:8px;transition:width .6s}
+        .ana-mod{background:rgba(255,255,255,.02);padding:24px;border-radius:14px;border:1px solid rgba(251,113,133,.18);margin-bottom:16px}
+        .ana-mod-title{font-size:1.2rem;color:#fb7185;font-weight:600;margin-bottom:12px}
+        .ana-mod-text{color:#c0c0c0;font-size:.97rem;line-height:1.85}
+        .theory-item{padding:22px;border-radius:14px;border-left:4px solid #fb7185;background:rgba(255,255,255,.02);margin-bottom:16px}
+        .theory-title{font-size:1.1rem;color:#fb7185;font-weight:600;margin-bottom:10px}
+        .theory-desc{color:#b0b0b0;font-size:.95rem;line-height:1.7}
+        .theory-src{color:#fb7185;font-size:.85rem;margin-top:8px;font-style:italic}
+        .action-item{background:rgba(255,255,255,.03);padding:24px;border-radius:14px;border:1px solid rgba(251,113,133,.18);margin-bottom:16px;transition:all .3s}
+        .action-item:hover{transform:translateY(-3px);border-color:rgba(251,113,133,.45);box-shadow:0 8px 25px rgba(251,113,133,.18)}
+        .action-title{font-size:1.15rem;color:#fb7185;font-weight:600;margin-bottom:10px;display:flex;align-items:center;gap:10px}
+        .action-num{background:linear-gradient(135deg,#fb7185,#e11d48);width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.85rem;font-weight:700;flex-shrink:0}
+        .action-text{color:#b0b0b0;font-size:.95rem;line-height:1.75}
+        .quote-box{text-align:center;padding:38px;background:rgba(251,113,133,.05);border:2px solid rgba(251,113,133,.25);border-radius:18px;margin-top:26px}
+        .quote-t{font-family:'Noto Serif SC',serif;font-size:1.45rem;color:#fff;line-height:1.8;margin-bottom:18px;font-style:italic}
+        .quote-a{color:#fb7185;font-size:1.05rem}
+        .btn-restart{width:100%;padding:16px;font-size:1.05rem;font-weight:700;border:none;border-radius:12px;cursor:pointer;background:linear-gradient(135deg,#fb7185,#e11d48);color:#fff;letter-spacing:2px;transition:all .3s;margin-top:28px}
+        .btn-restart:hover{transform:translateY(-3px)}
+        @media(max-width:768px){.main-title{font-size:2.4rem}.pw-box{padding:28px 20px}.fc-grid{grid-template-columns:1fr}.q-card{padding:26px 20px}.q-text{font-size:1.15rem}.nav-btns{flex-direction:column}.res-section{padding:24px 18px}}
+    </style>
+</head>
+<body>
+<canvas id="particles-canvas"></canvas>
+<div class="container">
+  <div class="page active" id="page-pw">
+    <div class="home-wrap">
+      <div class="top-badge">💕 专业亲密关系测评</div>
+      <h1 class="main-title">亲密关系深度测评</h1>
+      <p class="sub-title">洞察你的关系模式，构建深度爱的连接</p>
+      <p class="description">亲密关系是人生最深刻的功课之一。本测评基于依恋理论、约翰·高特曼关系研究和进化心理学，全面评估你的依恋风格、沟通模式、信任能力和关系满意度，帮助你了解自己的关系模式并提供科学的改善路径。</p>
+      <div class="feature-tags">
+        <span class="ftag">📊 40道专业题目</span>
+        <span class="ftag">⏱️ 约12分钟</span>
+        <span class="ftag">💡 关系深度解读</span>
+      </div>
+      <div class="pw-box">
+        <label class="pw-label">测评密码</label>
+        <input class="pw-input" type="password" id="pw-input" placeholder="请输入测评密码">
+        <button class="btn-start" onclick="checkPW()">开始测评</button>
+      </div>
+      <div class="fc-grid">
+        <div class="fc-card"><div class="fc-icon">💞</div><h3 class="fc-title">依恋风格</h3><p class="fc-desc">了解你的依恋模式对关系的深层影响</p></div>
+        <div class="fc-card"><div class="fc-icon">🗣️</div><h3 class="fc-title">沟通模式</h3><p class="fc-desc">发现你在关系中的沟通特点与盲点</p></div>
+        <div class="fc-card"><div class="fc-icon">🏡</div><h3 class="fc-title">关系蓝图</h3><p class="fc-desc">制定专属的关系成长行动计划</p></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="page" id="page-quiz">
+    <h1 class="qt">亲密关系深度测评</h1>
+    <p class="qt-sub">请根据真实感受和经历作答</p>
+    <div class="prog-bar"><div class="prog-fill" id="prog"></div></div>
+    <div class="q-card">
+      <span class="q-num" id="q-num">第 1 题 / 共 40 题</span>
+      <p class="q-text" id="q-text"></p>
+      <div class="options" id="opts"></div>
+    </div>
+    <div class="nav-btns">
+      <button class="btn-nav" id="btn-prev" onclick="prevQ()">上一题</button>
+      <button class="btn-nav" id="btn-next" onclick="nextQ()">下一题</button>
+    </div>
+  </div>
+
+  <div class="page" id="page-result">
+    <div class="res-header">
+      <h1 class="res-title">亲密关系报告</h1>
+      <p class="res-sub">基于40道专业题目的深度分析</p>
+      <div class="score-big" id="total-score">—</div>
+      <p class="score-lbl">关系健康指数 / 100</p>
+    </div>
+    <div class="res-section"><h2 class="sec-title">📊 四维关系分析</h2><div id="dims"></div></div>
+    <div class="res-section"><h2 class="sec-title">📖 深度关系解读</h2><div id="analysis"></div></div>
+    <div class="res-section"><h2 class="sec-title">🔬 科学理论基础</h2><div id="theories"></div></div>
+    <div class="res-section"><h2 class="sec-title">📈 关系成长行动计划</h2><div id="actions"></div></div>
+    <div class="quote-box"><p class="quote-t" id="qt-text"></p><p class="quote-a" id="qt-author"></p></div>
+    <button class="btn-restart" onclick="location.reload()">重新测评</button>
+  </div>
+</div>
+<script>
+const PASSWORDS=['REL888','REL666','REL999','REL123','REL456','REL789','REL101','REL202','REL303','REL404'];
+const Qs=[
+  {q:"当伴侣需要空间时，你会：",opts:[{t:"感到被抛弃，焦虑不安",s:[1,1,1,1]},{t:"不解，但勉强接受",s:[2,2,2,2]},{t:"理解并给予空间",s:[3,3,3,3]},{t:"主动支持，尊重彼此的独立空间",s:[4,4,4,4]}]},
+  {q:"在关系中，你对亲密程度的需求：",opts:[{t:"极度依赖，必须时刻在一起",s:[1,1,1,1]},{t:"需要较多陪伴",s:[2,2,2,2]},{t:"平衡亲密与独立",s:[3,3,3,3]},{t:"既享受深度亲密，也保持健康独立",s:[4,4,4,4]}]},
+  {q:"发生争吵后，你通常会：",opts:[{t:"长时间冷战，无法主动和解",s:[1,1,1,1]},{t:"等对方先道歉",s:[2,2,2,2]},{t:"冷静后主动沟通",s:[3,3,3,3]},{t:"及时修复，深入了解冲突根源",s:[4,4,4,4]}]},
+  {q:"你对伴侣的信任程度如何？",opts:[{t:"难以真正信任，总有疑虑",s:[1,1,1,1]},{t:"有条件信任，需要不断证明",s:[2,2,2,2]},{t:"基本信任，偶有不安",s:[3,3,3,3]},{t:"深度信任，安全感稳定",s:[4,4,4,4]}]},
+  {q:"面对伴侣的缺点时，你会：",opts:[{t:"无法接受，总想改变对方",s:[1,1,1,1]},{t:"经常抱怨",s:[2,2,2,2]},{t:"理解并接受大部分",s:[3,3,3,3]},{t:"真心接纳，欣赏对方的独特性",s:[4,4,4,4]}]},
+  {q:"在关系中，你是否善于表达需求？",opts:[{t:"很难表达，希望对方能猜到",s:[1,1,1,1]},{t:"有时表达，但不清晰",s:[2,2,2,2]},{t:"能较好地表达需求",s:[3,3,3,3]},{t:"清晰而温和地表达，并倾听对方回应",s:[4,4,4,4]}]},
+  {q:"遇到关系困境时，你会：",opts:[{t:"逃避或沉默",s:[1,1,1,1]},{t:"情绪化回应",s:[2,2,2,2]},{t:"直面问题，寻求解决",s:[3,3,3,3]},{t:"携手应对，共同成长",s:[4,4,4,4]}]},
+  {q:"你在关系中的独立性如何？",opts:[{t:"完全依赖伴侣，失去自我",s:[1,1,1,1]},{t:"较多依赖，自我模糊",s:[2,2,2,2]},{t:"有一定独立性",s:[3,3,3,3]},{t:"保持完整自我，在关系中持续成长",s:[4,4,4,4]}]},
+  {q:"你如何处理关系中的嫉妒情绪？",opts:[{t:"强烈嫉妒，难以控制",s:[1,1,1,1]},{t:"经常嫉妒，影响关系",s:[2,2,2,2]},{t:"偶有嫉妒，能管理",s:[3,3,3,3]},{t:"安全感充足，很少产生嫉妒",s:[4,4,4,4]}]},
+  {q:"对伴侣过去感情经历的态度：",opts:[{t:"无法接受，经常揪着过去不放",s:[1,1,1,1]},{t:"在意但勉强接受",s:[2,2,2,2]},{t:"基本接受",s:[3,3,3,3]},{t:"完全接纳，专注于当下的关系",s:[4,4,4,4]}]},
+  {q:"在关系中，你是否感到被理解？",opts:[{t:"很少感到被理解，孤独感强",s:[1,1,1,1]},{t:"偶尔感到理解",s:[2,2,2,2]},{t:"大多数时候感到被理解",s:[3,3,3,3]},{t:"深度被理解，心灵相通",s:[4,4,4,4]}]},
+  {q:"面对关系中的失望，你会：",opts:[{t:"立即爆发或彻底关闭",s:[1,1,1,1]},{t:"长期积压，影响关系",s:[2,2,2,2]},{t:"表达出来，寻求改善",s:[3,3,3,3]},{t:"建设性沟通，共同处理期望差异",s:[4,4,4,4]}]},
+  {q:"你是否能在关系中展现真实的自我？",opts:[{t:"总是伪装，害怕被真实的我拒绝",s:[1,1,1,1]},{t:"部分展现，有所保留",s:[2,2,2,2]},{t:"大多数时候能做自己",s:[3,3,3,3]},{t:"完全真实，被完整地爱和接纳",s:[4,4,4,4]}]},
+  {q:"对关系未来的态度：",opts:[{t:"对未来充满恐惧和不确定",s:[1,1,1,1]},{t:"模糊，不敢想太远",s:[2,2,2,2]},{t:"有一定规划和期待",s:[3,3,3,3]},{t:"有共同的愿景，积极共建未来",s:[4,4,4,4]}]},
+  {q:"当伴侣情绪低落时，你会：",opts:[{t:"不知所措，回避",s:[1,1,1,1]},{t:"给些安慰，但不深入",s:[2,2,2,2]},{t:"陪伴倾听",s:[3,3,3,3]},{t:"深度共情，提供有力的情感支持",s:[4,4,4,4]}]},
+  {q:"关系中的边界感如何？",opts:[{t:"缺乏边界，容易越界或被越界",s:[1,1,1,1]},{t:"边界模糊，经常出现问题",s:[2,2,2,2]},{t:"有一定边界意识",s:[3,3,3,3]},{t:"边界清晰健康，互相尊重",s:[4,4,4,4]}]},
+  {q:"你是否善于表达感激和赞美？",opts:[{t:"很少表达，觉得对方应该知道",s:[1,1,1,1]},{t:"偶尔表达",s:[2,2,2,2]},{t:"经常表达感激",s:[3,3,3,3]},{t:"日常表达欣赏，对方感到被珍视",s:[4,4,4,4]}]},
+  {q:"面对关系中的权力不平衡：",opts:[{t:"要么完全控制，要么完全顺从",s:[1,1,1,1]},{t:"有不平衡但不处理",s:[2,2,2,2]},{t:"尝试平衡",s:[3,3,3,3]},{t:"追求平等互尊的伙伴关系",s:[4,4,4,4]}]},
+  {q:"对伴侣隐私的态度：",opts:[{t:"觉得不应该有隐私，必须全部透明",s:[1,1,1,1]},{t:"在意但勉强接受",s:[2,2,2,2]},{t:"基本尊重",s:[3,3,3,3]},{t:"充分尊重对方的个人空间与隐私",s:[4,4,4,4]}]},
+  {q:"当关系遇到外部压力（工作、家庭）时：",opts:[{t:"压力转化为对伴侣的不满",s:[1,1,1,1]},{t:"互相消耗",s:[2,2,2,2]},{t:"共同面对，互相支持",s:[3,3,3,3]},{t:"压力下关系更加紧密，共同成长",s:[4,4,4,4]}]},
+  {q:"对关系中浪漫与激情的维持：",opts:[{t:"从不主动营造浪漫",s:[1,1,1,1]},{t:"偶尔想到才有",s:[2,2,2,2]},{t:"会有意维持浪漫",s:[3,3,3,3]},{t:"持续用心经营，让关系保持新鲜感",s:[4,4,4,4]}]},
+  {q:"你是否善于修复关系的裂痕？",opts:[{t:"裂痕往往难以修复",s:[1,1,1,1]},{t:"需要很长时间",s:[2,2,2,2]},{t:"能修复，但需要努力",s:[3,3,3,3]},{t:"能及时有效地修复，关系更加坚韧",s:[4,4,4,4]}]},
+  {q:"你如何看待关系中的成长与变化？",opts:[{t:"变化让我不安，希望一切不变",s:[1,1,1,1]},{t:"有些接受，但有抵触",s:[2,2,2,2]},{t:"接受变化，共同适应",s:[3,3,3,3]},{t:"期待共同成长，把变化视为机会",s:[4,4,4,4]}]},
+  {q:"面对伴侣的成功，你会：",opts:[{t:"感到嫉妒或威胁",s:[1,1,1,1]},{t:"表面高兴，内心复杂",s:[2,2,2,2]},{t:"为伴侣感到高兴",s:[3,3,3,3]},{t:"由衷为伴侣骄傲，主动庆祝",s:[4,4,4,4]}]},
+  {q:"在关系中，你的情感投入程度：",opts:[{t:"过度投入，失去自我",s:[1,1,1,1]},{t:"投入，但不平衡",s:[2,2,2,2]},{t:"适度投入",s:[3,3,3,3]},{t:"全心投入同时保持自我完整",s:[4,4,4,4]}]},
+  {q:"你是否善于设立和维护个人界限？",opts:[{t:"没有界限，或界限过于僵硬",s:[1,1,1,1]},{t:"界限模糊，经常被突破",s:[2,2,2,2]},{t:"能设立一定的界限",s:[3,3,3,3]},{t:"健康清晰的界限，有效保护自己和关系",s:[4,4,4,4]}]},
+  {q:"面对关系中的孤独感：",opts:[{t:"即使在一起也极度孤独",s:[1,1,1,1]},{t:"经常孤独，但不说出来",s:[2,2,2,2]},{t:"偶有孤独，会沟通",s:[3,3,3,3]},{t:"关系给予充分的连接感，孤独感少",s:[4,4,4,4]}]},
+  {q:"你如何看待承诺与忠诚？",opts:[{t:"承诺让我感到束缚和恐惧",s:[1,1,1,1]},{t:"承诺，但不深入理解其意义",s:[2,2,2,2]},{t:"重视承诺，认真对待",s:[3,3,3,3]},{t:"承诺是关系的礼物，深深珍视",s:[4,4,4,4]}]},
+  {q:"在关系中，你是否能持续学习和改变？",opts:[{t:"很难改变，固守习惯",s:[1,1,1,1]},{t:"有时愿意，但不持续",s:[2,2,2,2]},{t:"能为关系做出一定改变",s:[3,3,3,3]},{t:"持续自我反思，主动成长改变",s:[4,4,4,4]}]},
+  {q:"面对关系中的不公平感：",opts:[{t:"长期积压，最终爆发",s:[1,1,1,1]},{t:"在意，但不善处理",s:[2,2,2,2]},{t:"能表达并协商",s:[3,3,3,3]},{t:"及时坦诚沟通，共同维护关系公平",s:[4,4,4,4]}]},
+  {q:"你是否善于接受伴侣的关爱？",opts:[{t:"难以接受，感到不自在",s:[1,1,1,1]},{t:"接受，但有保留",s:[2,2,2,2]},{t:"能较好地接受关爱",s:[3,3,3,3]},{t:"坦然接受并表达感谢，形成良性循环",s:[4,4,4,4]}]},
+  {q:"关系中，你对妥协的态度：",opts:[{t:"拒绝妥协，或全面妥协失去自我",s:[1,1,1,1]},{t:"不情愿地妥协",s:[2,2,2,2]},{t:"能在重要问题上妥协",s:[3,3,3,3]},{t:"善于找到双方都满意的中间地带",s:[4,4,4,4]}]},
+  {q:"你在关系中是否有安全感？",opts:[{t:"极度缺乏安全感，经常担忧",s:[1,1,1,1]},{t:"安全感不稳定",s:[2,2,2,2]},{t:"基本有安全感",s:[3,3,3,3]},{t:"关系中安全感充足，内心平和",s:[4,4,4,4]}]},
+  {q:"面对伴侣的不同意见，你会：",opts:[{t:"坚持己见，不接受不同",s:[1,1,1,1]},{t:"表面同意，内心不满",s:[2,2,2,2]},{t:"开放讨论，寻求理解",s:[3,3,3,3]},{t:"欣赏差异，在讨论中共同成长",s:[4,4,4,4]}]},
+  {q:"关系结束时（假设情境），你会：",opts:[{t:"完全崩溃，无法前行",s:[1,1,1,1]},{t:"需要很长时间恢复",s:[2,2,2,2]},{t:"痛苦但能愈合",s:[3,3,3,3]},{t:"带着感恩和成长继续前行",s:[4,4,4,4]}]},
+  {q:"你是否会主动滋养和投资关系？",opts:[{t:"从不主动，期待对方付出",s:[1,1,1,1]},{t:"偶尔，缺乏持续性",s:[2,2,2,2]},{t:"会主动付出",s:[3,3,3,3]},{t:"持续用心投入，把关系当作最重要的事业",s:[4,4,4,4]}]},
+  {q:"你对关系中脆弱时刻的态度：",opts:[{t:"极力隐藏脆弱，不敢示弱",s:[1,1,1,1]},{t:"偶尔展现，但不自在",s:[2,2,2,2]},{t:"能与信任的人展现脆弱",s:[3,3,3,3]},{t:"以脆弱为力量，加深与伴侣的连接",s:[4,4,4,4]}]},
+  {q:"你的关系模式（整体）：",opts:[{t:"焦虑型/回避型，不健康模式",s:[1,1,1,1]},{t:"有不安全感，关系不稳定",s:[2,2,2,2]},{t:"相对安全，有提升空间",s:[3,3,3,3]},{t:"安全型依恋，关系稳定健康",s:[4,4,4,4]}]}
+];
+
+let curQ=0,answers=[],scores={attach:0,comm:0,trust:0,grow:0};
+function checkPW(){const v=document.getElementById('pw-input').value.trim();if(PASSWORDS.includes(v)){show('page-quiz');renderQ();}else alert('密码错误，请重试！');}
+function show(id){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.getElementById(id).classList.add('active');}
+function renderQ(){
+  const q=Qs[curQ];
+  document.getElementById('q-num').textContent=`第 ${curQ+1} 题 / 共 ${Qs.length} 题`;
+  document.getElementById('q-text').textContent=q.q;
+  document.getElementById('prog').style.width=`${(curQ+1)/Qs.length*100}%`;
+  const oc=document.getElementById('opts');oc.innerHTML='';
+  q.opts.forEach((o,i)=>{
+    const d=document.createElement('div');
+    d.className='opt'+(answers[curQ]===i?' selected':'');
+    d.textContent=o.t;
+    d.onclick=()=>{answers[curQ]=i;document.querySelectorAll('.opt').forEach((el,j)=>el.classList.toggle('selected',j===i));};
+    oc.appendChild(d);
+  });
+  document.getElementById('btn-prev').style.visibility=curQ===0?'hidden':'visible';
+  document.getElementById('btn-next').textContent=curQ===Qs.length-1?'查看结果':'下一题';
+}
+function prevQ(){if(curQ>0){curQ--;renderQ();}}
+function nextQ(){
+  if(answers[curQ]===undefined){alert('请选择一个选项！');return;}
+  if(curQ<Qs.length-1){curQ++;renderQ();}
+  else{calcResult();showResult();}
+}
+function calcResult(){
+  scores={attach:0,comm:0,trust:0,grow:0};
+  Qs.forEach((q,i)=>{const s=q.opts[answers[i]].s;scores.attach+=s[0];scores.comm+=s[1];scores.trust+=s[2];scores.grow+=s[3];});
+  const max=Qs.length*4;
+  scores.attach=Math.round(scores.attach/max*100);scores.comm=Math.round(scores.comm/max*100);
+  scores.trust=Math.round(scores.trust/max*100);scores.grow=Math.round(scores.grow/max*100);
+}
+function showResult(){
+  show('page-result');
+  const total=Math.round((scores.attach+scores.comm+scores.trust+scores.grow)/4);
+  document.getElementById('total-score').textContent=total;
+  renderDims();renderAnalysis(total);renderTheories();renderActions();renderQuote();
+}
+function lv(s){return s>=80?'健康':s>=65?'良好':s>=45?'一般':'需关注';}
+function renderDims(){
+  const dims=[
+    {name:'依恋安全感',score:scores.attach,desc:'依恋安全感反映你在关系中对被爱和被接纳的基础信念。安全型依恋者对关系充满信心，能平衡亲密与独立，在关系中展现真实自我。'},
+    {name:'沟通能力',score:scores.comm,desc:'关系中的沟通包括表达需求、倾听理解、处理冲突和修复裂痕的能力。高分者能清晰表达感受，深度倾听伴侣，用建设性方式化解矛盾。'},
+    {name:'信任与承诺',score:scores.trust,desc:'信任是关系的基石，承诺是爱的礼物。高分者对伴侣有深度信任，坦然接纳对方的全部，并将承诺视为关系中最珍贵的部分。'},
+    {name:'成长与滋养',score:scores.grow,desc:'健康的关系需要持续的投入和成长。高分者主动滋养关系，将变化视为机会，在关系中持续成长，同时支持伴侣的成长。'}
+  ];
+  document.getElementById('dims').innerHTML=dims.map(d=>`
+    <div class="dim-item">
+      <div class="dim-row"><span class="dim-name">${d.name}</span><span class="dim-type">${lv(d.score)}</span></div>
+      <div class="dim-score">${d.score} 分</div>
+      <p class="dim-desc">${d.desc}</p>
+      <div class="pb"><div class="pb-fill" style="width:${d.score}%"></div></div>
+    </div>`).join('');
+}
+function renderAnalysis(total){
+  let mods;
+  if(total>=75){mods=[
+    {t:'关系健康：安全型的爱',c:'你拥有健康的关系模式，能够在亲密与独立之间保持美丽的平衡。你带着安全感进入关系，不会因害怕失去而牢牢抓住，也不会因害怕亲密而逃避。在关系中，你能够展现真实的自我，接纳伴侣的全部。这种安全感不是来自伴侣，而是来自你内心深处对自己值得被爱的深层信念。'},
+    {t:'深度连接：真正的心灵相通',c:'你拥有建立深度情感连接的能力。你善于在关系中创造安全的空间，让双方都能坦然展现脆弱和真实。这种深度连接不是偶然，而是你用心倾听、真诚表达、耐心陪伴共同创造的结果。你的伴侣在你身边感到被深度理解和珍视，这是关系中最珍贵的礼物。'},
+    {t:'冲突智慧：把争吵变成深化关系的机会',c:'你具备出色的冲突处理能力，能够将争吵转化为加深了解的机会。你不会在冲突中逃避或攻击，而是能够在情绪平复后深入了解分歧背后的需求和恐惧。你明白，每一次成功修复的冲突都让关系变得更加坚韧和紧密，这是关系成熟的标志。'},
+    {t:'持续投入：关系的长期经营者',c:'你深知好的关系需要持续的用心投入，而不仅仅依赖最初的激情。你会主动创造美好时光，表达感激，维持浪漫，支持对方成长。这种持续的投入和经营，是关系从热情走向深沉、从依赖走向成熟的关键。你是关系中真正的长跑选手。'}
+  ];}else if(total>=55){mods=[
+    {t:'关系良好：有意识地成长中',c:'你的关系健康度良好，已经具备了许多健康关系的基础。你能够表达需求，处理冲突，信任伴侣，并为关系付出。偶尔你可能陷入焦虑或回避的模式，但你能够意识到并努力调整。你正在成为更好的伴侣的路上，每一步努力都在让关系变得更加健康和深厚。'},
+    {t:'依恋觉醒：认识你的关系模式',c:'每个人都有独特的依恋风格，源于早期与主要照顾者的互动模式。了解自己的依恋模式是关系成长的第一步。如果你有时焦虑担心被抛弃，有时又想逃离亲密，这都是依恋创伤的表现。好消息是，成人后通过意识和练习，依恋风格完全可以从焦虑型或回避型转变为安全型。'},
+    {t:'沟通提升：从表达到真正的沟通',c:'关系中的沟通不仅仅是把话说清楚，更是真正地被理解和理解对方。你的沟通能力有一定基础，但可以进一步提升。练习用"我感到..."代替"你总是..."，这一转变能从根本上改变对话的质量。同时，练习在倾听时放下自己的防御，真正理解伴侣的需求和感受背后的原因。'},
+    {t:'信任重建：一步一步深化安全感',c:'真正的信任不是一蹴而就的，而是通过无数小的一致性行动建立起来的。如果你在信任方面有挑战，可以从小事开始建立：说到做到，对伴侣坦诚，在伴侣脆弱时给予支持。每一次可靠的行动都在加深信任的基础。记住，信任是关系中最宝贵的资产，值得用心呵护。'}
+  ];}else{mods=[
+    {t:'关系需要关注：成长的起点',c:'你的关系模式在一些关键方面需要关注和改善。这可能来自早期依恋经历的影响，或者过去关系中的伤痛。重要的是，这不是你的错，也不是无法改变的命运。带着自我慈悲去了解自己的模式，是改变的开始。每一个人都值得被爱，也有能力给予爱——包括你。'},
+    {t:'依恋创伤：理解你关系困境的根源',c:'许多人在关系中的困难，根源在于早期依恋经历中形成的不安全感。如果你在关系中经常感到焦虑、被抛弃，或者强烈渴望却又害怕亲密，这可能是焦虑型或恐惧型依恋的表现。了解这些模式，并通过心理咨询或自我疗愈来处理，能从根本上改变你的关系质量。你值得拥有安全感和深度连接的爱。'},
+    {t:'安全感建设：从自己开始',c:'关系中的安全感最终来自内心。如果你过度依赖伴侣给予安全感，或者完全回避亲密以保护自己，建议你开始内在安全感的建设工作。通过自我关爱练习、心理咨询，或阅读依恋理论相关书籍，了解你的内在小孩的需求，学会成为自己的安全基地。这是一切健康关系的根基。'},
+    {t:'沟通基础：从倾听和表达开始',c:'改善关系的最基础步骤是学习真正的倾听和清晰的表达。真正的倾听意味着放下评判，全心理解对方在说什么、感受什么。清晰的表达意味着说出你的感受和需求，而不是攻击或指责。推荐阅读《非暴力沟通》和《爱的五种语言》，这两本书提供了具体可操作的沟通框架，能帮助你从根本上改善关系互动。'}
+  ];}
+  document.getElementById('analysis').innerHTML=mods.map(m=>`<div class="ana-mod"><h3 class="ana-mod-title">${m.t}</h3><p class="ana-mod-text">${m.c}</p></div>`).join('');
+}
+function renderTheories(){
+  const ts=[
+    {t:'约翰·鲍尔比依恋理论',d:'鲍尔比的依恋理论提出，婴儿与主要照顾者形成的情感纽带会深刻影响其成年后的亲密关系模式。安全型依恋者对关系充满信任，能平衡亲密与独立；焦虑型依恋者对被抛弃高度敏感；回避型依恋者压抑亲密需求以保护自己。研究表明，约55-65%的成人具有安全型依恋，但通过意识和努力，不安全依恋完全可以转变。',s:'Bowlby, J. (1969). Attachment and Loss. Basic Books.'},
+    {t:'约翰·高特曼关系研究',d:'高特曼经过40年对数千对夫妻的研究，发现了预测关系成功或失败的关键因素。他的"四骑士"理论指出，批评、蔑视、防御和冷战是关系最大的杀手。而成功关系的关键在于：五比一的正负互动比例、情感账户的持续存款、有效的冲突修复机制和共同意义的建立。高特曼的研究为关系科学提供了最有力的实证基础。',s:'Gottman, J. (1994). Why Marriages Succeed or Fail. Simon & Schuster.'},
+    {t:'布雷内·布朗的脆弱力量研究',d:'布朗的研究颠覆了人们对脆弱的认知。她发现，愿意展现脆弱的人，恰恰是拥有最深刻连接感和最充实生活的人。在关系中，分享脆弱不是软弱，而是勇气的表现，是建立深度亲密连接的必要条件。她的研究证明，"完美伴侣"的幻想会阻碍真正的亲密，而愿意以真实的、不完美的自我被看见，才能创造真正的连接。',s:'Brown, B. (2010). The Gifts of Imperfection. Hazelden Publishing.'}
+  ];
+  document.getElementById('theories').innerHTML=ts.map(t=>`<div class="theory-item"><h3 class="theory-title">${t.t}</h3><p class="theory-desc">${t.d}</p><p class="theory-src">来源：${t.s}</p></div>`).join('');
+}
+function renderActions(){
+  const acts=[
+    {t:'建立每日情感连接仪式',c:'高特曼研究发现，关系中的"情感账户"需要日常存款。建立每天5-10分钟的深度连接时间：放下手机，真正面对面地交流，分享当天的一个想法、一个感受、一件让你感激的事。这个简单的每日仪式，能显著增加关系的满意度和亲密感。坚持30天，你将感受到关系质量的明显提升。'},
+    {t:'练习非暴力沟通',c:'马歇尔·卢森堡的非暴力沟通模式包含四个步骤：观察（描述具体行为，不评判）、感受（表达自己的情绪）、需要（说出背后的需求）、请求（提出具体可行的请求）。每次感到关系中有不满时，练习用这个框架表达，而不是攻击或指责。这一方法已被全球数百万对伴侣证明有效，能从根本上改变关系的沟通质量。'},
+    {t:'深化了解：每周"知心对话"',c:'每周安排一次专属的"知心对话"时间（30-60分钟），轮流回答有深度的问题，如"你最近内心最深处的担忧是什么？""你最想被我用什么方式支持你？""你的梦想现在在哪里？"这种有意识的深度对话，能持续拓展双方的相互了解，防止关系进入"相处舒适却距离渐远"的困境。'},
+    {t:'修复关系裂痕的三步法',c:'当关系出现裂痕时，运用高特曼的修复三步法：首先暂停激烈的情绪（如果需要，给自己20分钟冷静期）；其次带着好奇而非防御地重新对话："我想理解你的感受，能告诉我你当时的体验吗？"；最后真诚道歉和共同制定改进方案。研究表明，修复裂痕的方式和速度，比冲突本身更能预测关系的长期健康。'},
+    {t:'每日五感感恩练习',c:'每天用具体的语言向伴侣表达一个感激：不是"谢谢你今天的帮助"，而是"你今天主动做饭，让我感到被照顾，内心非常温暖"。具体而真诚的感激能让伴侣感到被真正看见和珍视。高特曼的研究显示，5:1的正负互动比例是关系健康的黄金标准——每一个负面互动，需要5个正面互动来平衡。'}
+  ];
+  document.getElementById('actions').innerHTML=acts.map((a,i)=>`<div class="action-item"><h3 class="action-title"><span class="action-num">${i+1}</span>${a.t}</h3><p class="action-text">${a.c}</p></div>`).join('');
+}
+function renderQuote(){
+  const qs=[
+    {t:'"真正的爱不是找到一个完美的人，而是学会用完美的眼光去欣赏一个不完美的人。"',a:'萨姆·基恩'},
+    {t:'"爱不是彼此对望，而是一起朝同一方向看。"',a:'圣埃克苏佩里'},
+    {t:'"在所有形式的谨慎中，爱情上的谨慎或许是对幸福最大的阻碍。"',a:'伯特兰·罗素'},
+    {t:'"最深刻的幸福，来自于被人完整地认识后，仍然被爱着。"',a:'布雷内·布朗'}
+  ];
+  const q=qs[Math.floor(Math.random()*qs.length)];
+  document.getElementById('qt-text').textContent=q.t;
+  document.getElementById('qt-author').textContent=`—— ${q.a}`;
+}
+function initParticles(){
+  const canvas=document.getElementById('particles-canvas');
+  if(!canvas)return;
+  const ctx=canvas.getContext('2d');if(!ctx)return;
+  function resize(){canvas.width=window.innerWidth;canvas.height=window.innerHeight;}
+  resize();
+  const ps=Array.from({length:80},()=>({x:Math.random()*canvas.width,y:Math.random()*canvas.height,vx:(Math.random()-.5)*.5,vy:(Math.random()-.5)*.5,r:Math.random()*2.5+.8,c:['#fb7185','#e11d48','#fda4af'][Math.floor(Math.random()*3)],a:Math.random()*.5+.3}));
+  function draw(){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    ps.forEach((p,i)=>{
+      p.x+=p.vx;p.y+=p.vy;
+      if(p.x<0||p.x>canvas.width)p.vx*=-1;if(p.y<0||p.y>canvas.height)p.vy*=-1;
+      ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fillStyle=p.c;ctx.globalAlpha=p.a;ctx.fill();ctx.globalAlpha=1;
+      for(let j=i+1;j<ps.length;j++){const q=ps[j],dx=p.x-q.x,dy=p.y-q.y,d=Math.sqrt(dx*dx+dy*dy);if(d<140){ctx.beginPath();ctx.moveTo(p.x,p.y);ctx.lineTo(q.x,q.y);ctx.strokeStyle=p.c;ctx.lineWidth=.5;ctx.globalAlpha=(140-d)/140*.25;ctx.stroke();ctx.globalAlpha=1;}}
+    });
+    requestAnimationFrame(draw);
+  }
+  draw();window.addEventListener('resize',resize);
+}
+document.addEventListener('DOMContentLoaded',initParticles);
+document.getElementById('pw-input').addEventListener('keypress',e=>{if(e.key==='Enter')checkPW();});
+</script>
+</body>
+</html>

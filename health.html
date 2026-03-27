@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>心理健康深度测评</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{font-family:'Noto Sans SC',sans-serif;background:#0a0a14;color:#fff;min-height:100vh;overflow-x:hidden}
+        #particles-canvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none}
+        .container{position:relative;z-index:1;max-width:900px;margin:0 auto;padding:40px 20px}
+        .page{display:none;animation:fadeIn .5s ease}.page.active{display:block}
+        @keyframes fadeIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+        .home-wrap{text-align:center;padding-top:60px}
+        .top-badge{display:inline-block;background:linear-gradient(135deg,#34d399,#10b981);padding:8px 24px;border-radius:30px;font-size:.95rem;font-weight:600;margin-bottom:30px;box-shadow:0 4px 15px rgba(52,211,153,.35)}
+        .main-title{font-family:'Noto Serif SC',serif;font-size:3.5rem;background:linear-gradient(135deg,#6ee7b7,#34d399,#10b981);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;filter:drop-shadow(0 0 25px rgba(52,211,153,.4));line-height:1.2;margin-bottom:16px}
+        .sub-title{font-size:1.25rem;color:#ccc;margin-bottom:12px}
+        .description{font-size:1rem;color:#999;line-height:1.8;max-width:680px;margin:0 auto 28px}
+        .feature-tags{display:flex;justify-content:center;gap:16px;flex-wrap:wrap;margin-bottom:40px}
+        .ftag{background:rgba(52,211,153,.1);border:1px solid rgba(52,211,153,.3);padding:8px 20px;border-radius:20px;font-size:.9rem;color:#34d399}
+        .pw-box{max-width:460px;margin:0 auto 50px;background:rgba(20,20,30,.7);backdrop-filter:blur(10px);border:2px solid rgba(52,211,153,.35);border-radius:20px;padding:45px;box-shadow:0 0 60px rgba(52,211,153,.25)}
+        .pw-label{text-align:center;color:#34d399;font-size:1.05rem;margin-bottom:16px;display:block}
+        .pw-input{width:100%;padding:16px;font-size:1.2rem;background:rgba(10,10,20,.9);border:2px solid #333;border-radius:12px;color:#34d399;text-align:center;margin-bottom:22px;transition:all .3s}
+        .pw-input:focus{outline:none;border-color:#34d399;box-shadow:0 0 20px rgba(52,211,153,.35)}
+        .pw-input::placeholder{color:rgba(52,211,153,.3)}
+        .btn-start{width:100%;padding:16px;font-size:1.1rem;font-weight:700;border:none;border-radius:12px;cursor:pointer;background:linear-gradient(135deg,#34d399,#10b981);color:#fff;letter-spacing:2px;transition:all .3s;box-shadow:0 6px 20px rgba(52,211,153,.4)}
+        .btn-start:hover{transform:translateY(-3px);box-shadow:0 10px 30px rgba(52,211,153,.55)}
+        .fc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:20px;padding:0 10px}
+        .fc-card{background:rgba(20,20,30,.6);backdrop-filter:blur(8px);border:1px solid rgba(52,211,153,.2);border-radius:16px;padding:28px 22px;text-align:center;transition:all .3s}
+        .fc-card:hover{transform:translateY(-5px);border-color:rgba(52,211,153,.5);box-shadow:0 10px 30px rgba(52,211,153,.2)}
+        .fc-icon{font-size:2.5rem;margin-bottom:14px}
+        .fc-title{font-size:1.1rem;font-weight:600;color:#34d399;margin-bottom:8px}
+        .fc-desc{font-size:.9rem;color:#999;line-height:1.6}
+        h1.qt{font-family:'Noto Serif SC',serif;font-size:2rem;color:#34d399;text-align:center;margin-bottom:8px;text-shadow:0 0 25px rgba(52,211,153,.4)}
+        .qt-sub{text-align:center;color:#999;margin-bottom:25px}
+        .prog-bar{height:8px;background:rgba(255,255,255,.1);border-radius:10px;margin-bottom:28px;overflow:hidden}
+        .prog-fill{height:100%;background:linear-gradient(90deg,#34d399,#10b981);border-radius:10px;transition:width .5s}
+        .q-card{background:rgba(20,20,30,.8);border:2px solid rgba(52,211,153,.3);border-radius:20px;padding:38px;margin-bottom:24px}
+        .q-num{display:inline-block;background:linear-gradient(135deg,#34d399,#10b981);padding:5px 16px;border-radius:15px;font-size:.85rem;margin-bottom:18px}
+        .q-text{font-size:1.35rem;line-height:1.8;color:#fff;margin-bottom:28px}
+        .options{display:grid;gap:14px}
+        .opt{background:rgba(255,255,255,.04);border:2px solid rgba(52,211,153,.2);border-radius:12px;padding:18px 22px;cursor:pointer;font-size:1.05rem;transition:all .3s}
+        .opt:hover{background:rgba(52,211,153,.1);border-color:#34d399;transform:translateX(5px)}
+        .opt.selected{background:rgba(52,211,153,.2);border-color:#34d399;box-shadow:0 0 18px rgba(52,211,153,.3)}
+        .nav-btns{display:flex;gap:14px;margin-top:22px}
+        .btn-nav{flex:1;padding:14px;font-size:1rem;background:rgba(52,211,153,.1);border:2px solid #34d399;color:#34d399;border-radius:10px;cursor:pointer;font-weight:600;transition:all .3s}
+        .btn-nav:hover{background:#34d399;color:#fff}
+        .res-header{text-align:center;padding:30px;background:rgba(20,20,30,.8);border:2px solid rgba(52,211,153,.3);border-radius:20px;margin-bottom:28px}
+        .res-title{font-family:'Noto Serif SC',serif;font-size:2.5rem;color:#34d399;margin-bottom:8px}
+        .res-sub{font-size:1.1rem;color:#999;margin-bottom:18px}
+        .score-big{font-size:3.5rem;font-weight:700;color:#34d399;text-shadow:0 0 30px rgba(52,211,153,.6)}
+        .score-lbl{color:#aaa;font-size:1rem;margin-top:6px}
+        .res-section{background:rgba(20,20,30,.8);border:2px solid rgba(52,211,153,.3);border-radius:20px;padding:35px;margin-bottom:26px}
+        .sec-title{font-family:'Noto Serif SC',serif;font-size:1.7rem;color:#34d399;margin-bottom:22px;display:flex;align-items:center;gap:10px}
+        .dim-item{background:rgba(255,255,255,.03);padding:20px;border-radius:14px;border-left:4px solid #34d399;margin-bottom:18px}
+        .dim-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+        .dim-name{font-size:1.1rem;font-weight:600}
+        .dim-type{font-size:1rem;color:#34d399;font-weight:600}
+        .dim-score{font-size:1.8rem;font-weight:700;color:#34d399;margin:6px 0}
+        .dim-desc{color:#b0b0b0;font-size:.95rem;line-height:1.7;margin-bottom:12px}
+        .pb{height:9px;background:rgba(255,255,255,.08);border-radius:8px;overflow:hidden}
+        .pb-fill{height:100%;background:linear-gradient(90deg,#34d399,#10b981);border-radius:8px;transition:width .6s}
+        .ana-mod{background:rgba(255,255,255,.02);padding:24px;border-radius:14px;border:1px solid rgba(52,211,153,.18);margin-bottom:16px}
+        .ana-mod-title{font-size:1.2rem;color:#34d399;font-weight:600;margin-bottom:12px}
+        .ana-mod-text{color:#c0c0c0;font-size:.97rem;line-height:1.85}
+        .theory-item{padding:22px;border-radius:14px;border-left:4px solid #34d399;background:rgba(255,255,255,.02);margin-bottom:16px}
+        .theory-title{font-size:1.1rem;color:#34d399;font-weight:600;margin-bottom:10px}
+        .theory-desc{color:#b0b0b0;font-size:.95rem;line-height:1.7}
+        .theory-src{color:#34d399;font-size:.85rem;margin-top:8px;font-style:italic}
+        .action-item{background:rgba(255,255,255,.03);padding:24px;border-radius:14px;border:1px solid rgba(52,211,153,.18);margin-bottom:16px;transition:all .3s}
+        .action-item:hover{transform:translateY(-3px);border-color:rgba(52,211,153,.45);box-shadow:0 8px 25px rgba(52,211,153,.18)}
+        .action-title{font-size:1.15rem;color:#34d399;font-weight:600;margin-bottom:10px;display:flex;align-items:center;gap:10px}
+        .action-num{background:linear-gradient(135deg,#34d399,#10b981);width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.85rem;font-weight:700;flex-shrink:0}
+        .action-text{color:#b0b0b0;font-size:.95rem;line-height:1.75}
+        .quote-box{text-align:center;padding:38px;background:rgba(52,211,153,.05);border:2px solid rgba(52,211,153,.25);border-radius:18px;margin-top:26px}
+        .quote-t{font-family:'Noto Serif SC',serif;font-size:1.45rem;color:#fff;line-height:1.8;margin-bottom:18px;font-style:italic}
+        .quote-a{color:#34d399;font-size:1.05rem}
+        .btn-restart{width:100%;padding:16px;font-size:1.05rem;font-weight:700;border:none;border-radius:12px;cursor:pointer;background:linear-gradient(135deg,#34d399,#10b981);color:#fff;letter-spacing:2px;transition:all .3s;margin-top:28px}
+        .btn-restart:hover{transform:translateY(-3px)}
+        @media(max-width:768px){.main-title{font-size:2.4rem}.pw-box{padding:28px 20px}.fc-grid{grid-template-columns:1fr}.q-card{padding:26px 20px}.q-text{font-size:1.15rem}.nav-btns{flex-direction:column}.res-section{padding:24px 18px}}
+    </style>
+</head>
+<body>
+<canvas id="particles-canvas"></canvas>
+<div class="container">
+  <div class="page active" id="page-pw">
+    <div class="home-wrap">
+      <div class="top-badge">🌿 专业心理健康测评</div>
+      <h1 class="main-title">心理健康深度测评</h1>
+      <p class="sub-title">了解你的心理状态，守护内在健康</p>
+      <p class="description">心理健康是幸福生活的基石。本测评基于积极心理学、压力与韧性理论和幸福科学，全面评估你的情绪健康、压力管理、自我价值感和生活满意度四大核心维度，帮助你了解当前的心理状态并提供科学的改善路径。</p>
+      <div class="feature-tags">
+        <span class="ftag">📊 40道专业题目</span>
+        <span class="ftag">⏱️ 约12分钟</span>
+        <span class="ftag">🌱 科学健康指导</span>
+      </div>
+      <div class="pw-box">
+        <label class="pw-label">测评密码</label>
+        <input class="pw-input" type="password" id="pw-input" placeholder="请输入测评密码">
+        <button class="btn-start" onclick="checkPW()">开始测评</button>
+      </div>
+      <div class="fc-grid">
+        <div class="fc-card"><div class="fc-icon">🧘</div><h3 class="fc-title">情绪健康</h3><p class="fc-desc">评估你的情绪状态与心理平衡能力</p></div>
+        <div class="fc-card"><div class="fc-icon">💪</div><h3 class="fc-title">抗压韧性</h3><p class="fc-desc">了解你面对压力和挑战的心理韧性</p></div>
+        <div class="fc-card"><div class="fc-icon">✨</div><h3 class="fc-title">幸福指南</h3><p class="fc-desc">获取个性化的心理健康提升建议</p></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="page" id="page-quiz">
+    <h1 class="qt">心理健康深度测评</h1>
+    <p class="qt-sub">请根据近一个月内的真实状态作答</p>
+    <div class="prog-bar"><div class="prog-fill" id="prog"></div></div>
+    <div class="q-card">
+      <span class="q-num" id="q-num">第 1 题 / 共 40 题</span>
+      <p class="q-text" id="q-text"></p>
+      <div class="options" id="opts"></div>
+    </div>
+    <div class="nav-btns">
+      <button class="btn-nav" id="btn-prev" onclick="prevQ()">上一题</button>
+      <button class="btn-nav" id="btn-next" onclick="nextQ()">下一题</button>
+    </div>
+  </div>
+
+  <div class="page" id="page-result">
+    <div class="res-header">
+      <h1 class="res-title">心理健康报告</h1>
+      <p class="res-sub">基于40道专业题目的深度分析</p>
+      <div class="score-big" id="total-score">—</div>
+      <p class="score-lbl">心理健康指数 / 100</p>
+    </div>
+    <div class="res-section"><h2 class="sec-title">📊 四维健康分析</h2><div id="dims"></div></div>
+    <div class="res-section"><h2 class="sec-title">📖 深度健康解读</h2><div id="analysis"></div></div>
+    <div class="res-section"><h2 class="sec-title">🔬 科学理论基础</h2><div id="theories"></div></div>
+    <div class="res-section"><h2 class="sec-title">📈 个性化健康行动计划</h2><div id="actions"></div></div>
+    <div class="quote-box"><p class="quote-t" id="qt-text"></p><p class="quote-a" id="qt-author"></p></div>
+    <button class="btn-restart" onclick="location.reload()">重新测评</button>
+  </div>
+</div>
+<script>
+const PASSWORDS=['HL888','HL666','HL999','HL123','HL456','HL789','HL101','HL202','HL303','HL404'];
+const Qs=[
+  {q:"近一个月，你的整体情绪状态：",opts:[{t:"大部分时间情绪低落或空洞",s:[1,1,1,1]},{t:"情绪起伏较大，不稳定",s:[2,2,2,2]},{t:"总体平稳，偶有波动",s:[3,3,3,3]},{t:"积极乐观，内心充实",s:[4,4,4,4]}]},
+  {q:"你的睡眠质量如何？",opts:[{t:"严重失眠或过度嗜睡",s:[1,1,1,1]},{t:"经常睡不好",s:[2,2,2,2]},{t:"大部分时候睡眠良好",s:[3,3,3,3]},{t:"睡眠质量优秀，精力充沛",s:[4,4,4,4]}]},
+  {q:"面对日常压力时，你会：",opts:[{t:"崩溃，无法应对",s:[1,1,1,1]},{t:"感到沉重，勉强应付",s:[2,2,2,2]},{t:"能应对，偶感吃力",s:[3,3,3,3]},{t:"从容应对，甚至因压力而更加专注",s:[4,4,4,4]}]},
+  {q:"你对自己的评价如何？",opts:[{t:"经常否定自己，觉得很差",s:[1,1,1,1]},{t:"有较多的自我批评",s:[2,2,2,2]},{t:"基本接受自己，偶有自我批评",s:[3,3,3,3]},{t:"高度自我接纳，有清晰的自我价值感",s:[4,4,4,4]}]},
+  {q:"你对生活的满意度：",opts:[{t:"对生活感到失望或空洞",s:[1,1,1,1]},{t:"有些不满意，但说不清哪里",s:[2,2,2,2]},{t:"基本满意",s:[3,3,3,3]},{t:"生活充实有意义，高度满意",s:[4,4,4,4]}]},
+  {q:"你是否有清晰的人生目标和方向感？",opts:[{t:"完全迷失，不知道为什么活",s:[1,1,1,1]},{t:"目标模糊，方向不清",s:[2,2,2,2]},{t:"有一定方向，但不够清晰",s:[3,3,3,3]},{t:"目标清晰，充满使命感",s:[4,4,4,4]}]},
+  {q:"你维护人际关系的能力：",opts:[{t:"极度孤立，与人疏离",s:[1,1,1,1]},{t:"社交关系浅薄",s:[2,2,2,2]},{t:"有稳定的人际支持",s:[3,3,3,3]},{t:"拥有深厚丰富的人际网络",s:[4,4,4,4]}]},
+  {q:"你是否经常感到焦虑或紧张？",opts:[{t:"几乎每天都很焦虑",s:[1,1,1,1]},{t:"经常焦虑",s:[2,2,2,2]},{t:"偶有焦虑，能管理",s:[3,3,3,3]},{t:"很少焦虑，内心平和",s:[4,4,4,4]}]},
+  {q:"你是否享受日常生活中的小事？",opts:[{t:"对什么都提不起兴趣",s:[1,1,1,1]},{t:"偶尔能享受",s:[2,2,2,2]},{t:"经常能找到生活的乐趣",s:[3,3,3,3]},{t:"日常生活充满惊喜和感激",s:[4,4,4,4]}]},
+  {q:"遇到挫折时，你的恢复能力：",opts:[{t:"很难恢复，长期受影响",s:[1,1,1,1]},{t:"需要较长时间",s:[2,2,2,2]},{t:"能较好地恢复",s:[3,3,3,3]},{t:"快速恢复，并从挫折中成长",s:[4,4,4,4]}]},
+  {q:"你是否有照顾自身健康的习惯？",opts:[{t:"完全忽视，不运动不休息",s:[1,1,1,1]},{t:"偶尔关注，但不持续",s:[2,2,2,2]},{t:"有一定健康习惯",s:[3,3,3,3]},{t:"系统地维护身心健康",s:[4,4,4,4]}]},
+  {q:"你对未来的看法：",opts:[{t:"悲观，看不到希望",s:[1,1,1,1]},{t:"不确定，担忧较多",s:[2,2,2,2]},{t:"相对乐观，有期待",s:[3,3,3,3]},{t:"充满希望，积极面向未来",s:[4,4,4,4]}]},
+  {q:"你是否能感受到生命的意义感？",opts:[{t:"感到空虚，生命无意义",s:[1,1,1,1]},{t:"意义感模糊",s:[2,2,2,2]},{t:"有一定意义感",s:[3,3,3,3]},{t:"强烈的意义感，活得很充实",s:[4,4,4,4]}]},
+  {q:"你处理负面情绪的方式：",opts:[{t:"压抑、逃避或极端宣泄",s:[1,1,1,1]},{t:"不健康地应对（暴食、过度玩手机）",s:[2,2,2,2]},{t:"有一些健康的应对方式",s:[3,3,3,3]},{t:"成熟地处理，情绪快速恢复",s:[4,4,4,4]}]},
+  {q:"你的专注力和工作效率如何？",opts:[{t:"无法集中，效率极低",s:[1,1,1,1]},{t:"经常分心，效率不高",s:[2,2,2,2]},{t:"大部分时候能专注",s:[3,3,3,3]},{t:"高度专注，效率卓越",s:[4,4,4,4]}]},
+  {q:"你是否允许自己休息和放松？",opts:[{t:"完全无法休息，或躺平摆烂",s:[1,1,1,1]},{t:"休息有罪恶感",s:[2,2,2,2]},{t:"能有限地休息",s:[3,3,3,3]},{t:"高质量的休息是生活重要部分",s:[4,4,4,4]}]},
+  {q:"你对自己的身体感受如何？",opts:[{t:"经常有不明原因的身体不适",s:[1,1,1,1]},{t:"身体时常感到疲惫",s:[2,2,2,2]},{t:"身体状态基本良好",s:[3,3,3,3]},{t:"精力充沛，与身体和谐共处",s:[4,4,4,4]}]},
+  {q:"你是否善于寻求帮助？",opts:[{t:"极度自我封闭，拒绝帮助",s:[1,1,1,1]},{t:"很难开口，独自承受",s:[2,2,2,2]},{t:"在需要时能寻求帮助",s:[3,3,3,3]},{t:"主动建立支持网络，善用资源",s:[4,4,4,4]}]},
+  {q:"你对改变和成长的态度：",opts:[{t:"抗拒改变，固守现状",s:[1,1,1,1]},{t:"想改变但缺乏动力",s:[2,2,2,2]},{t:"愿意成长，有所行动",s:[3,3,3,3]},{t:"积极拥抱成长，持续自我超越",s:[4,4,4,4]}]},
+  {q:"面对失败或犯错时，你的内心反应：",opts:[{t:"严厉自责，甚至自我惩罚",s:[1,1,1,1]},{t:"强烈的羞耻感",s:[2,2,2,2]},{t:"自我批评，但能接受",s:[3,3,3,3]},{t:"自我慈悲，从错误中学习",s:[4,4,4,4]}]},
+  {q:"你的日常生活是否有规律？",opts:[{t:"生活完全混乱无序",s:[1,1,1,1]},{t:"规律性差，经常失调",s:[2,2,2,2]},{t:"有基本规律",s:[3,3,3,3]},{t:"生活结构清晰，习惯良好",s:[4,4,4,4]}]},
+  {q:"你是否经常感到空虚或无聊？",opts:[{t:"几乎每天都感到空虚",s:[1,1,1,1]},{t:"经常有空虚感",s:[2,2,2,2]},{t:"偶有，但不持久",s:[3,3,3,3]},{t:"生活充实，很少感到空虚",s:[4,4,4,4]}]},
+  {q:"你是否能接受自己的不完美？",opts:[{t:"无法接受，追求完美到痛苦",s:[1,1,1,1]},{t:"难以接受，经常自责",s:[2,2,2,2]},{t:"基本接受，偶有困扰",s:[3,3,3,3]},{t:"完全接纳，以自我慈悲代替完美主义",s:[4,4,4,4]}]},
+  {q:"你是否有充满热情的爱好或兴趣？",opts:[{t:"对任何事都提不起兴趣",s:[1,1,1,1]},{t:"有些兴趣但不深入",s:[2,2,2,2]},{t:"有一些让自己投入的爱好",s:[3,3,3,3]},{t:"有深度热情的兴趣，带来心流体验",s:[4,4,4,4]}]},
+  {q:"面对生命中的不确定性，你会：",opts:[{t:"极度焦虑，无法承受",s:[1,1,1,1]},{t:"忧虑较多，消耗精力",s:[2,2,2,2]},{t:"接受，但需要努力调整",s:[3,3,3,3]},{t:"以平和心态拥抱不确定",s:[4,4,4,4]}]},
+  {q:"你是否能感受到感恩和欣赏？",opts:[{t:"很难感受，常觉得理所当然",s:[1,1,1,1]},{t:"偶尔能感受",s:[2,2,2,2]},{t:"经常能感到感恩",s:[3,3,3,3]},{t:"日常培养感恩，感到富足",s:[4,4,4,4]}]},
+  {q:"你工作/学习与生活的平衡：",opts:[{t:"严重失衡，精疲力竭",s:[1,1,1,1]},{t:"失衡，但没有改变",s:[2,2,2,2]},{t:"基本平衡",s:[3,3,3,3]},{t:"良好平衡，两方面都充实",s:[4,4,4,4]}]},
+  {q:"你是否善于表达自己的需求？",opts:[{t:"完全压抑，从不表达",s:[1,1,1,1]},{t:"很难表达，经常压抑",s:[2,2,2,2]},{t:"能表达，但不总是清晰",s:[3,3,3,3]},{t:"清晰健康地表达，边界感好",s:[4,4,4,4]}]},
+  {q:"你的社交生活质量：",opts:[{t:"极度孤立，缺乏连接",s:[1,1,1,1]},{t:"社交较少，连接感弱",s:[2,2,2,2]},{t:"有一定的社交连接",s:[3,3,3,3]},{t:"社交丰富，深度连接",s:[4,4,4,4]}]},
+  {q:"你对心理健康话题的态度：",opts:[{t:"认为心理问题是软弱，回避",s:[1,1,1,1]},{t:"了解有限，有些抵触",s:[2,2,2,2]},{t:"接受并关注心理健康",s:[3,3,3,3]},{t:"主动学习，积极维护心理健康",s:[4,4,4,4]}]},
+  {q:"你是否有应对困难时期的资源？",opts:[{t:"感到完全孤立无援",s:[1,1,1,1]},{t:"资源有限",s:[2,2,2,2]},{t:"有一定的支持和资源",s:[3,3,3,3]},{t:"拥有丰富的内外部资源",s:[4,4,4,4]}]},
+  {q:"你的自我效能感（相信自己能完成目标）：",opts:[{t:"很低，经常觉得自己做不到",s:[1,1,1,1]},{t:"不稳定，容易动摇",s:[2,2,2,2]},{t:"基本相信自己",s:[3,3,3,3]},{t:"强大的自我效能感，能挑战高目标",s:[4,4,4,4]}]},
+  {q:"你是否定期进行自我反思？",opts:[{t:"从不反思，活在惯性中",s:[1,1,1,1]},{t:"偶尔，但不深入",s:[2,2,2,2]},{t:"经常反思",s:[3,3,3,3]},{t:"深度且持续的自我觉察",s:[4,4,4,4]}]},
+  {q:"你对生命短暂性的感受：",opts:[{t:"充满死亡恐惧或虚无感",s:[1,1,1,1]},{t:"让我焦虑，回避思考",s:[2,2,2,2]},{t:"接受，偶尔思考",s:[3,3,3,3]},{t:"以此为动力，珍惜当下",s:[4,4,4,4]}]},
+  {q:"你是否有定期的放松和充电方式？",opts:[{t:"没有，一直处于紧绷状态",s:[1,1,1,1]},{t:"偶尔有，但不规律",s:[2,2,2,2]},{t:"有一些放松方式",s:[3,3,3,3]},{t:"系统且有效的充电方式",s:[4,4,4,4]}]},
+  {q:"你最近的生活，整体而言：",opts:[{t:"感到挣扎，很不容易",s:[1,1,1,1]},{t:"平淡，有些无力",s:[2,2,2,2]},{t:"还不错，有些满足",s:[3,3,3,3]},{t:"充实有意义，蓬勃生长",s:[4,4,4,4]}]}
+];
+
+let curQ=0,answers=[],scores={emo:0,stress:0,self:0,life:0};
+function checkPW(){const v=document.getElementById('pw-input').value.trim();if(PASSWORDS.includes(v)){show('page-quiz');renderQ();}else alert('密码错误，请重试！');}
+function show(id){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.getElementById(id).classList.add('active');}
+function renderQ(){
+  const q=Qs[curQ];
+  document.getElementById('q-num').textContent=`第 ${curQ+1} 题 / 共 ${Qs.length} 题`;
+  document.getElementById('q-text').textContent=q.q;
+  document.getElementById('prog').style.width=`${(curQ+1)/Qs.length*100}%`;
+  const oc=document.getElementById('opts');oc.innerHTML='';
+  q.opts.forEach((o,i)=>{
+    const d=document.createElement('div');
+    d.className='opt'+(answers[curQ]===i?' selected':'');
+    d.textContent=o.t;
+    d.onclick=()=>{answers[curQ]=i;document.querySelectorAll('.opt').forEach((el,j)=>el.classList.toggle('selected',j===i));};
+    oc.appendChild(d);
+  });
+  document.getElementById('btn-prev').style.visibility=curQ===0?'hidden':'visible';
+  document.getElementById('btn-next').textContent=curQ===Qs.length-1?'查看结果':'下一题';
+}
+function prevQ(){if(curQ>0){curQ--;renderQ();}}
+function nextQ(){
+  if(answers[curQ]===undefined){alert('请选择一个选项！');return;}
+  if(curQ<Qs.length-1){curQ++;renderQ();}
+  else{calcResult();showResult();}
+}
+function calcResult(){
+  scores={emo:0,stress:0,self:0,life:0};
+  Qs.forEach((q,i)=>{const s=q.opts[answers[i]].s;scores.emo+=s[0];scores.stress+=s[1];scores.self+=s[2];scores.life+=s[3];});
+  const max=Qs.length*4;
+  scores.emo=Math.round(scores.emo/max*100);scores.stress=Math.round(scores.stress/max*100);
+  scores.self=Math.round(scores.self/max*100);scores.life=Math.round(scores.life/max*100);
+}
+function showResult(){
+  show('page-result');
+  const total=Math.round((scores.emo+scores.stress+scores.self+scores.life)/4);
+  document.getElementById('total-score').textContent=total;
+  renderDims();renderAnalysis(total);renderTheories();renderActions();renderQuote();
+}
+function lv(s){return s>=80?'优秀':s>=65?'良好':s>=45?'一般':'需关注';}
+function renderDims(){
+  const dims=[
+    {name:'情绪健康',score:scores.emo,desc:'情绪健康指维持整体积极的情绪基调，能够感受快乐和满足，有效处理负面情绪而不被淹没。高分者情绪稳定，有感知和表达情绪的能力，内心有平和感。'},
+    {name:'压力管理',score:scores.stress,desc:'压力管理包括识别压力来源、运用有效策略应对压力，并在压力中保持功能状态的能力。高分者拥有良好的心理韧性，能将压力转化为成长动力。'},
+    {name:'自我价值感',score:scores.self,desc:'自我价值感是对自己内在价值的稳定信念，独立于外部评价。高分者有清晰的自我认同，能以自我慈悲代替严苛的自我批评，接纳自己的不完美。'},
+    {name:'生活满意度',score:scores.life,desc:'生活满意度是对生活整体质量的主观评价，包括意义感、目标感、关系质量和幸福感。高分者感到生活充实有意义，对未来充满期待。'}
+  ];
+  document.getElementById('dims').innerHTML=dims.map(d=>`
+    <div class="dim-item">
+      <div class="dim-row"><span class="dim-name">${d.name}</span><span class="dim-type">${lv(d.score)}</span></div>
+      <div class="dim-score">${d.score} 分</div>
+      <p class="dim-desc">${d.desc}</p>
+      <div class="pb"><div class="pb-fill" style="width:${d.score}%"></div></div>
+    </div>`).join('');
+}
+function renderAnalysis(total){
+  let mods;
+  if(total>=75){mods=[
+    {t:'心理健康：蓬勃生长的状态',c:'你的心理健康状态出色，处于积极心理学所说的"蓬勃"状态。你不仅仅是没有心理问题，而是真正地在生活中蓬勃生长——充满活力，有意义感，与他人有深度连接，能够全身心投入生活。你拥有强大的心理资本：乐观、希望、韧性和自我效能感，这些是你面对人生挑战的最坚实保障。'},
+    {t:'情绪智慧：与情绪和谐共处',c:'你拥有良好的情绪健康，能够以智慧和技巧与自己的情绪共处。你不会被负面情绪淹没，也不会压抑情绪，而是能够允许情绪流动，从情绪中获取信息，并在适当时候放下。你的情绪调节能力让你在面对生活起伏时保持内心的稳定与平衡，这是心理健康最重要的标志之一。'},
+    {t:'内在力量：稳固的自我根基',c:'你拥有稳固的自我价值感和自我接纳能力。你不需要通过外部成就或他人认可来证明自己的价值，你内心有一个稳定的锚点。这种内在稳定性让你能够面对批评而不崩溃，接受失败而不绝望，在不确定中保持方向感。这是所有心理健康成就中最根本的一项。'},
+    {t:'生命丰盛：有意义的充实人生',c:'你的生活充满意义感和满足感，你活出了自己真正想要的生活。你有清晰的价值观和目标，有深度的人际连接，有让你投入的事业和兴趣。这种生命的丰盛感不是偶然，而是你持续投入和珍视内心生活的结果。保持这种对生命的热情和感恩，你将继续创造丰盛的人生。'}
+  ];}else if(total>=55){mods=[
+    {t:'心理健康良好：稳步向前',c:'你的心理健康状态良好，能够有效应对日常生活的挑战，维持总体积极的情绪状态。你有一定的应对资源，能在困难时找到支持，并从挫折中恢复。偶尔你可能感到压力过大或情绪不稳，但整体而言，你的心理根基较为稳固，并在持续成长的路上。'},
+    {t:'压力智慧：学习驾驭压力',c:'你已经具备了一定的压力管理能力，但仍有提升空间。现代研究表明，压力不一定是有害的，关键在于你如何看待它。持有"压力是成长信号"的心态，比"压力是威胁"的心态，在生理和心理上产生截然不同的反应。学习更多有效的压力管理技巧，并建立更完善的生活支持系统，将帮助你更从容地驾驭压力。'},
+    {t:'自我关爱：给自己更多温柔',c:'你在自我关爱方面可以更加慷慨。许多人对待自己比对待朋友更严苛，这是不公平的。如果你的朋友面临你现在的挑战，你会如何对待他？用同样的温柔、理解和支持来对待自己。自我慈悲不是软弱，研究表明，高自我慈悲者在失败后恢复更快，表现更好，生活满意度更高。'},
+    {t:'意义探索：深化生命的厚度',c:'你的生活满意度有提升的空间。意义感不是等来的，而是主动探索和建立的。问自己：什么让我感到真正的充实（不只是快乐）？什么时候我觉得自己在做有价值的事？什么关系让我感到真正的连接？围绕这些答案重新设计你的时间和精力分配，你将感受到生命厚度的增加。'}
+  ];}else{mods=[
+    {t:'需要关注：及时照顾自己',c:'你的心理健康状态需要认真关注。如果你持续感到情绪低落、焦虑、空虚或无力，这是你的内心在向你发出信号——它需要帮助。请不要忽视这些信号。心理困境和身体疾病一样正常，同样需要照顾。最重要的第一步是承认自己正在挣扎，并寻求适当的支持。'},
+    {t:'寻求支持：你不必独自承受',c:'寻求帮助是勇气，不是软弱。如果你感到难以应对，请主动联系你信任的朋友、家人，或寻求专业的心理咨询。心理咨询不是"有大问题"才需要，而是任何时候想要更好地了解自己、处理情绪、改善生活都可以使用的专业支持。给自己这个礼物，就像你病了会看医生一样自然。'},
+    {t:'小步前行：从今天的一件事开始',c:'改善心理健康不需要一次做完很多事，从今天的一件事开始。可能是出门走15分钟，可能是给一个朋友发一条真心的消息，可能是写下三件今天感谢的小事。积极心理学研究证明，这些小小的行动能真实地改善情绪和幸福感。每一步都很重要，每一步都算数。今天就选择一件事开始。'},
+    {t:'自我慈悲：以温柔对待自己',c:'在这个困难时期，最重要的是对自己温柔。你正在承受的一切是真实的，你的挣扎是真实的，你的感受是有效的。你不需要否认这些，也不需要立即"好起来"。允许自己以现在的样子存在，给自己时间和空间。正如布雷内·布朗所说：你只需要在今天足够好。明天可以再想明天的事。'}
+  ];}
+  document.getElementById('analysis').innerHTML=mods.map(m=>`<div class="ana-mod"><h3 class="ana-mod-title">${m.t}</h3><p class="ana-mod-text">${m.c}</p></div>`).join('');
+}
+function renderTheories(){
+  const ts=[
+    {t:'塞利格曼PERMA幸福模型',d:'马丁·塞利格曼创立了积极心理学，并提出PERMA幸福模型：积极情绪（Positive Emotions）、投入（Engagement）、关系（Relationships）、意义（Meaning）和成就（Accomplishment）。他的研究表明，真正的幸福不仅仅是快乐，而是在这五个维度上的全面蓬勃。每个维度都可以通过具体的实践来培养和强化，幸福是一种可以主动创造的状态。',s:'Seligman, M. E. P. (2011). Flourish: A Visionary New Understanding of Happiness and Well-being.'},
+    {t:'克里斯汀·内夫的自我慈悲理论',d:'内夫的研究表明，自我慈悲由三个部分组成：对自己的善意（而非自我批评）、共同人性的认识（认识到痛苦是人类共同经历）和正念（平衡地观察困难经历）。研究一致证明，高自我慈悲者拥有更好的情绪健康、更强的心理韧性、更低的焦虑抑郁水平，以及更高的生活满意度。自我慈悲不是自我放纵，而是真正的自我关爱。',s:'Neff, K. (2011). Self-Compassion: The Proven Power of Being Kind to Yourself.'},
+    {t:'芭芭拉·弗雷德里克森的积极情绪拓建理论',d:'弗雷德里克森的研究证明，积极情绪不仅让人感觉良好，更能"拓建"我们的思维、行动资源和人际关系。持续的积极情绪能够建立心理韧性、扩展认知灵活性、加强社会连接，形成一个向上的螺旋效应。她发现，积极情绪与消极情绪的3:1比例，是心理健康蓬勃的关键阈值。培养积极情绪不是强迫乐观，而是主动创造更多真实的积极体验。',s:'Fredrickson, B. L. (2009). Positivity: Groundbreaking Research Reveals How to Embrace the Hidden Strength of Positive Emotions.'}
+  ];
+  document.getElementById('theories').innerHTML=ts.map(t=>`<div class="theory-item"><h3 class="theory-title">${t.t}</h3><p class="theory-desc">${t.d}</p><p class="theory-src">来源：${t.s}</p></div>`).join('');
+}
+function renderActions(){
+  const acts=[
+    {t:'建立每日感恩日记',c:'每天睡前写下3件感激的具体小事，不要泛化（不是"感谢生命"，而是"感谢今天同事主动帮我完成了报告"）。研究表明，坚持8周的感恩日记能显著提升幸福感、改善睡眠质量、增强社会连接感。关键是具体性和新鲜感——每天寻找新的感激点，避免重复，让大脑保持对美好事物的敏感度。'},
+    {t:'每日15分钟正念冥想',c:'正念冥想是被研究最充分的心理健康干预方法之一。哈佛大学研究发现，8周的正念减压训练能使大脑杏仁核（压力中心）缩小，前额叶皮层（情绪调节中心）增厚。每天15分钟，从专注呼吸开始，不评判地观察浮现的思绪和情绪。推荐使用正念冥想应用（Headspace、潮汐、冥想星球）入门。4周内你将感受到明显改变。'},
+    {t:'建立高质量睡眠习惯',c:'睡眠是心理健康最基础的支柱。建立一致的睡眠时间表（每天同一时间入睡和起床，包括周末）；睡前1小时远离屏幕，进行放松仪式（阅读、泡脚、伸展）；确保卧室黑暗、安静、凉爽。研究表明，每减少1小时睡眠，焦虑程度显著上升，情绪调节能力下降。优质睡眠是一切心理健康实践的基础。'},
+    {t:'每周至少3次有氧运动',c:'运动是被科学证明最有效的抗抑郁和抗焦虑干预方法之一，效果媲美药物治疗。运动能促进大脑分泌内啡肽、血清素和脑源性神经营养因子（BDNF），直接改善情绪、提升认知功能、增强心理韧性。每周3次、每次30分钟的有氧运动（快走、跑步、游泳、骑行），8周内你将感受到心理健康的显著改善。'},
+    {t:'深化社会连接',c:'哈佛幸福研究追踪了75年的数据，结论只有一个：决定人们晚年幸福和健康的最重要因素，不是财富、名誉或成就，而是关系的质量。每周主动联系一位重要的人，不是刷屏互动，而是真正的对话——面对面或通话。分享真实的感受和想法，了解对方的生活。深度的社会连接是心理健康最强大的保护因子。'}
+  ];
+  document.getElementById('actions').innerHTML=acts.map((a,i)=>`<div class="action-item"><h3 class="action-title"><span class="action-num">${i+1}</span>${a.t}</h3><p class="action-text">${a.c}</p></div>`).join('');
+}
+function renderQuote(){
+  const qs=[
+    {t:'"心理健康不是没有困难，而是在困难中仍然蓬勃生长的能力。"',a:'马丁·塞利格曼'},
+    {t:'"自我慈悲是在黑暗中点亮一盏灯，让你能够看清自己而不逃跑。"',a:'克里斯汀·内夫'},
+    {t:'"幸福不是命运赐予的，而是你每天的选择和实践。"',a:'维克多·弗兰克尔'},
+    {t:'"照顾好自己，不是自私，而是你能好好爱别人的前提。"',a:'未知'}
+  ];
+  const q=qs[Math.floor(Math.random()*qs.length)];
+  document.getElementById('qt-text').textContent=q.t;
+  document.getElementById('qt-author').textContent=`—— ${q.a}`;
+}
+function initParticles(){
+  const canvas=document.getElementById('particles-canvas');if(!canvas)return;
+  const ctx=canvas.getContext('2d');if(!ctx)return;
+  function resize(){canvas.width=window.innerWidth;canvas.height=window.innerHeight;}
+  resize();
+  const ps=Array.from({length:80},()=>({x:Math.random()*canvas.width,y:Math.random()*canvas.height,vx:(Math.random()-.5)*.5,vy:(Math.random()-.5)*.5,r:Math.random()*2.5+.8,c:['#34d399','#10b981','#6ee7b7'][Math.floor(Math.random()*3)],a:Math.random()*.5+.3}));
+  function draw(){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    ps.forEach((p,i)=>{
+      p.x+=p.vx;p.y+=p.vy;
+      if(p.x<0||p.x>canvas.width)p.vx*=-1;if(p.y<0||p.y>canvas.height)p.vy*=-1;
+      ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fillStyle=p.c;ctx.globalAlpha=p.a;ctx.fill();ctx.globalAlpha=1;
+      for(let j=i+1;j<ps.length;j++){const q=ps[j],dx=p.x-q.x,dy=p.y-q.y,d=Math.sqrt(dx*dx+dy*dy);if(d<140){ctx.beginPath();ctx.moveTo(p.x,p.y);ctx.lineTo(q.x,q.y);ctx.strokeStyle=p.c;ctx.lineWidth=.5;ctx.globalAlpha=(140-d)/140*.25;ctx.stroke();ctx.globalAlpha=1;}}
+    });
+    requestAnimationFrame(draw);
+  }
+  draw();window.addEventListener('resize',resize);
+}
+document.addEventListener('DOMContentLoaded',initParticles);
+document.getElementById('pw-input').addEventListener('keypress',e=>{if(e.key==='Enter')checkPW();});
+</script>
+</body>
+</html>

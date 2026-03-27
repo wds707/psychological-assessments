@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>智力潜能测评</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { font-family:'Noto Sans SC',sans-serif; background:#0a0a14; color:#fff; min-height:100vh; overflow-x:hidden; }
+        #particles-canvas { position:fixed; top:0; left:0; width:100%; height:100%; z-index:0; pointer-events:none; }
+        .container { position:relative; z-index:1; max-width:900px; margin:0 auto; padding:40px 20px; }
+        .page { display:none; animation:fadeIn .5s ease; }
+        .page.active { display:block; }
+        @keyframes fadeIn { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+
+        .home-wrap { text-align:center; padding-top:60px; }
+        .top-badge { display:inline-block; background:linear-gradient(135deg,#60a5fa,#3b82f6); padding:8px 24px; border-radius:30px; font-size:.95rem; font-weight:600; margin-bottom:30px; box-shadow:0 4px 15px rgba(96,165,250,.35); }
+        .main-title { font-family:'Noto Serif SC',serif; font-size:3.5rem; background:linear-gradient(135deg,#bfdbfe,#60a5fa,#3b82f6); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; filter:drop-shadow(0 0 25px rgba(96,165,250,.4)); line-height:1.2; margin-bottom:16px; }
+        .sub-title { font-size:1.25rem; color:#ccc; margin-bottom:12px; }
+        .description { font-size:1rem; color:#999; line-height:1.8; max-width:680px; margin:0 auto 28px; }
+        .feature-tags { display:flex; justify-content:center; gap:16px; flex-wrap:wrap; margin-bottom:40px; }
+        .ftag { background:rgba(96,165,250,.1); border:1px solid rgba(96,165,250,.3); padding:8px 20px; border-radius:20px; font-size:.9rem; color:#60a5fa; }
+        .pw-box { max-width:460px; margin:0 auto 50px; background:rgba(20,20,30,.7); backdrop-filter:blur(10px); border:2px solid rgba(96,165,250,.35); border-radius:20px; padding:45px; box-shadow:0 0 60px rgba(96,165,250,.25); }
+        .pw-label { text-align:center; color:#60a5fa; font-size:1.05rem; margin-bottom:16px; display:block; }
+        .pw-input { width:100%; padding:16px; font-size:1.2rem; background:rgba(10,10,20,.9); border:2px solid #333; border-radius:12px; color:#60a5fa; text-align:center; margin-bottom:22px; transition:all .3s; }
+        .pw-input:focus { outline:none; border-color:#60a5fa; box-shadow:0 0 20px rgba(96,165,250,.35); }
+        .pw-input::placeholder { color:rgba(96,165,250,.3); }
+        .btn-start { width:100%; padding:16px; font-size:1.1rem; font-weight:700; border:none; border-radius:12px; cursor:pointer; background:linear-gradient(135deg,#60a5fa,#3b82f6); color:#fff; letter-spacing:2px; transition:all .3s; box-shadow:0 6px 20px rgba(96,165,250,.4); }
+        .btn-start:hover { transform:translateY(-3px); box-shadow:0 10px 30px rgba(96,165,250,.55); }
+        .fc-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:20px; padding:0 10px; }
+        .fc-card { background:rgba(20,20,30,.6); backdrop-filter:blur(8px); border:1px solid rgba(96,165,250,.2); border-radius:16px; padding:28px 22px; text-align:center; transition:all .3s; }
+        .fc-card:hover { transform:translateY(-5px); border-color:rgba(96,165,250,.5); box-shadow:0 10px 30px rgba(96,165,250,.2); }
+        .fc-icon { font-size:2.5rem; margin-bottom:14px; }
+        .fc-title { font-size:1.1rem; font-weight:600; color:#60a5fa; margin-bottom:8px; }
+        .fc-desc { font-size:.9rem; color:#999; line-height:1.6; }
+
+        h1.qt { font-family:'Noto Serif SC',serif; font-size:2rem; color:#60a5fa; text-align:center; margin-bottom:8px; text-shadow:0 0 25px rgba(96,165,250,.4); }
+        .qt-sub { text-align:center; color:#999; margin-bottom:25px; }
+        .prog-bar { height:8px; background:rgba(255,255,255,.1); border-radius:10px; margin-bottom:28px; overflow:hidden; }
+        .prog-fill { height:100%; background:linear-gradient(90deg,#60a5fa,#3b82f6); border-radius:10px; transition:width .5s; }
+        .q-card { background:rgba(20,20,30,.8); border:2px solid rgba(96,165,250,.3); border-radius:20px; padding:38px; margin-bottom:24px; }
+        .q-num { display:inline-block; background:linear-gradient(135deg,#60a5fa,#3b82f6); padding:5px 16px; border-radius:15px; font-size:.85rem; margin-bottom:18px; }
+        .q-text { font-size:1.35rem; line-height:1.8; color:#fff; margin-bottom:28px; }
+        .options { display:grid; gap:14px; }
+        .opt { background:rgba(255,255,255,.04); border:2px solid rgba(96,165,250,.2); border-radius:12px; padding:18px 22px; cursor:pointer; font-size:1.05rem; transition:all .3s; }
+        .opt:hover { background:rgba(96,165,250,.1); border-color:#60a5fa; transform:translateX(5px); }
+        .opt.selected { background:rgba(96,165,250,.2); border-color:#60a5fa; box-shadow:0 0 18px rgba(96,165,250,.3); }
+        .nav-btns { display:flex; gap:14px; margin-top:22px; }
+        .btn-nav { flex:1; padding:14px; font-size:1rem; background:rgba(96,165,250,.1); border:2px solid #60a5fa; color:#60a5fa; border-radius:10px; cursor:pointer; font-weight:600; transition:all .3s; }
+        .btn-nav:hover { background:#60a5fa; color:#fff; }
+
+        .res-header { text-align:center; padding:30px; background:rgba(20,20,30,.8); border:2px solid rgba(96,165,250,.3); border-radius:20px; margin-bottom:28px; }
+        .res-title { font-family:'Noto Serif SC',serif; font-size:2.5rem; color:#60a5fa; margin-bottom:8px; }
+        .res-sub { font-size:1.1rem; color:#999; margin-bottom:18px; }
+        .score-big { font-size:3.5rem; font-weight:700; color:#60a5fa; text-shadow:0 0 30px rgba(96,165,250,.6); }
+        .score-lbl { color:#aaa; font-size:1rem; margin-top:6px; }
+        .res-section { background:rgba(20,20,30,.8); border:2px solid rgba(96,165,250,.3); border-radius:20px; padding:35px; margin-bottom:26px; }
+        .sec-title { font-family:'Noto Serif SC',serif; font-size:1.7rem; color:#60a5fa; margin-bottom:22px; display:flex; align-items:center; gap:10px; }
+        .dim-item { background:rgba(255,255,255,.03); padding:20px; border-radius:14px; border-left:4px solid #60a5fa; margin-bottom:18px; }
+        .dim-row { display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; }
+        .dim-name { font-size:1.1rem; font-weight:600; }
+        .dim-type { font-size:1rem; color:#60a5fa; font-weight:600; }
+        .dim-score { font-size:1.8rem; font-weight:700; color:#60a5fa; margin:6px 0; }
+        .dim-desc { color:#b0b0b0; font-size:.95rem; line-height:1.7; margin-bottom:12px; }
+        .pb { height:9px; background:rgba(255,255,255,.08); border-radius:8px; overflow:hidden; }
+        .pb-fill { height:100%; background:linear-gradient(90deg,#60a5fa,#3b82f6); border-radius:8px; transition:width .6s; }
+        .ana-mod { background:rgba(255,255,255,.02); padding:24px; border-radius:14px; border:1px solid rgba(96,165,250,.18); margin-bottom:16px; }
+        .ana-mod-title { font-size:1.2rem; color:#60a5fa; font-weight:600; margin-bottom:12px; }
+        .ana-mod-text { color:#c0c0c0; font-size:.97rem; line-height:1.85; }
+        .theory-item { padding:22px; border-radius:14px; border-left:4px solid #60a5fa; background:rgba(255,255,255,.02); margin-bottom:16px; }
+        .theory-title { font-size:1.1rem; color:#60a5fa; font-weight:600; margin-bottom:10px; }
+        .theory-desc { color:#b0b0b0; font-size:.95rem; line-height:1.7; }
+        .theory-src { color:#60a5fa; font-size:.85rem; margin-top:8px; font-style:italic; }
+        .action-item { background:rgba(255,255,255,.03); padding:24px; border-radius:14px; border:1px solid rgba(96,165,250,.18); margin-bottom:16px; transition:all .3s; }
+        .action-item:hover { transform:translateY(-3px); border-color:rgba(96,165,250,.45); box-shadow:0 8px 25px rgba(96,165,250,.18); }
+        .action-title { font-size:1.15rem; color:#60a5fa; font-weight:600; margin-bottom:10px; display:flex; align-items:center; gap:10px; }
+        .action-num { background:linear-gradient(135deg,#60a5fa,#3b82f6); width:28px; height:28px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:.85rem; font-weight:700; flex-shrink:0; }
+        .action-text { color:#b0b0b0; font-size:.95rem; line-height:1.75; }
+        .quote-box { text-align:center; padding:38px; background:rgba(96,165,250,.05); border:2px solid rgba(96,165,250,.25); border-radius:18px; margin-top:26px; }
+        .quote-t { font-family:'Noto Serif SC',serif; font-size:1.45rem; color:#fff; line-height:1.8; margin-bottom:18px; font-style:italic; }
+        .quote-a { color:#60a5fa; font-size:1.05rem; }
+        .btn-restart { width:100%; padding:16px; font-size:1.05rem; font-weight:700; border:none; border-radius:12px; cursor:pointer; background:linear-gradient(135deg,#60a5fa,#3b82f6); color:#fff; letter-spacing:2px; transition:all .3s; margin-top:28px; }
+        .btn-restart:hover { transform:translateY(-3px); }
+
+        @media(max-width:768px) {
+            .main-title{font-size:2.4rem} .pw-box{padding:28px 20px} .fc-grid{grid-template-columns:1fr}
+            .q-card{padding:26px 20px} .q-text{font-size:1.15rem} .nav-btns{flex-direction:column} .res-section{padding:24px 18px}
+        }
+    </style>
+</head>
+<body>
+<canvas id="particles-canvas"></canvas>
+<div class="container">
+
+  <div class="page active" id="page-pw">
+    <div class="home-wrap">
+      <div class="top-badge">🧠 专业智力潜能测评</div>
+      <h1 class="main-title">智力潜能测评</h1>
+      <p class="sub-title">发现你的认知优势，解锁思维潜力</p>
+      <p class="description">智力潜能涵盖逻辑推理、语言能力、空间想象、数学思维和创造力等多个维度。本测评采用专业认知能力评估体系，帮助你全面了解自己的智力特征，发现最适合发挥的领域。</p>
+      <div class="feature-tags">
+        <span class="ftag">📊 40道专业题目</span>
+        <span class="ftag">⏱️ 约15分钟</span>
+        <span class="ftag">🎯 多维智力分析</span>
+      </div>
+      <div class="pw-box">
+        <label class="pw-label">测评密码</label>
+        <input class="pw-input" type="password" id="pw-input" placeholder="请输入测评密码">
+        <button class="btn-start" onclick="checkPW()">开始测评</button>
+      </div>
+      <div class="fc-grid">
+        <div class="fc-card"><div class="fc-icon">🔍</div><h3 class="fc-title">逻辑推理</h3><p class="fc-desc">评估你的抽象推理与逻辑分析能力</p></div>
+        <div class="fc-card"><div class="fc-icon">💡</div><h3 class="fc-title">创造力</h3><p class="fc-desc">探索你的发散思维与创新思考潜力</p></div>
+        <div class="fc-card"><div class="fc-icon">📐</div><h3 class="fc-title">空间思维</h3><p class="fc-desc">衡量你的空间想象与视觉处理能力</p></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="page" id="page-quiz">
+    <h1 class="qt">智力潜能测评</h1>
+    <p class="qt-sub">请仔细阅读每道题，选择最符合你的选项</p>
+    <div class="prog-bar"><div class="prog-fill" id="prog"></div></div>
+    <div class="q-card">
+      <span class="q-num" id="q-num">第 1 题 / 共 40 题</span>
+      <p class="q-text" id="q-text"></p>
+      <div class="options" id="opts"></div>
+    </div>
+    <div class="nav-btns">
+      <button class="btn-nav" id="btn-prev" onclick="prevQ()">上一题</button>
+      <button class="btn-nav" id="btn-next" onclick="nextQ()">下一题</button>
+    </div>
+  </div>
+
+  <div class="page" id="page-result">
+    <div class="res-header">
+      <h1 class="res-title">智力潜能报告</h1>
+      <p class="res-sub">基于40道专业题目的深度分析</p>
+      <div class="score-big" id="total-score">—</div>
+      <p class="score-lbl">综合智力指数 / 100</p>
+    </div>
+    <div class="res-section"><h2 class="sec-title">📊 四维能力分析</h2><div id="dims"></div></div>
+    <div class="res-section"><h2 class="sec-title">📖 深度智力解读</h2><div id="analysis"></div></div>
+    <div class="res-section"><h2 class="sec-title">🔬 科学理论基础</h2><div id="theories"></div></div>
+    <div class="res-section"><h2 class="sec-title">📈 个性化成长行动计划</h2><div id="actions"></div></div>
+    <div class="quote-box"><p class="quote-t" id="qt-text"></p><p class="quote-a" id="qt-author"></p></div>
+    <button class="btn-restart" onclick="location.reload()">重新测评</button>
+  </div>
+
+</div>
+<script>
+const PASSWORDS = ['IQ888','IQ666','IQ999','IQ123','IQ456','IQ789','IQ101','IQ202','IQ303','IQ404'];
+
+const Qs = [
+  {q:"面对一个复杂问题时，你通常会：",opts:[{t:"凭感觉快速给出答案",s:[1,1,1,1]},{t:"随便想想，差不多就行",s:[2,2,2,2]},{t:"系统分析后得出结论",s:[3,3,3,3]},{t:"拆解问题，建立模型，寻找最优解",s:[4,4,4,4]}]},
+  {q:"学习新知识时，你倾向于：",opts:[{t:"死记硬背，不求理解",s:[1,1,1,1]},{t:"大概了解表面意思",s:[2,2,2,2]},{t:"理解原理，举一反三",s:[3,3,3,3]},{t:"深度探究，建立知识体系",s:[4,4,4,4]}]},
+  {q:"你阅读理解和文字表达能力如何？",opts:[{t:"理解困难，表达不清",s:[1,1,1,1]},{t:"基本能理解，表达一般",s:[2,2,2,2]},{t:"理解准确，表达清晰",s:[3,3,3,3]},{t:"理解深刻，表达精准有力",s:[4,4,4,4]}]},
+  {q:"在脑海中想象和操作三维图形的能力：",opts:[{t:"很困难，难以想象",s:[1,1,1,1]},{t:"勉强能想象，但不准确",s:[2,2,2,2]},{t:"能较好地想象和操作",s:[3,3,3,3]},{t:"能轻松地在脑海中旋转和变换图形",s:[4,4,4,4]}]},
+  {q:"看到一个数字规律题，你的反应是：",opts:[{t:"看不出规律，很困惑",s:[1,1,1,1]},{t:"需要很长时间才能找到",s:[2,2,2,2]},{t:"能找到规律，但要一些时间",s:[3,3,3,3]},{t:"迅速识别规律，并能预测下一个",s:[4,4,4,4]}]},
+  {q:"遇到全新领域的问题时，你会：",opts:[{t:"束手无策，等待帮助",s:[1,1,1,1]},{t:"尝试，但经常出错",s:[2,2,2,2]},{t:"运用已有知识迁移解决",s:[3,3,3,3]},{t:"快速建立框架，创造性地寻找解法",s:[4,4,4,4]}]},
+  {q:"你的记忆力和信息处理速度如何？",opts:[{t:"记忆差，处理速度慢",s:[1,1,1,1]},{t:"一般，有时会遗忘",s:[2,2,2,2]},{t:"良好，能记住重要信息",s:[3,3,3,3]},{t:"记忆力强，能快速处理大量信息",s:[4,4,4,4]}]},
+  {q:"面对矛盾信息时，你会：",opts:[{t:"随便相信其中一个",s:[1,1,1,1]},{t:"不知所措，无法判断",s:[2,2,2,2]},{t:"对比分析，找出可信的一方",s:[3,3,3,3]},{t:"批判性地审视，找出逻辑漏洞",s:[4,4,4,4]}]},
+  {q:"你擅长从大量数据中发现规律吗？",opts:[{t:"不擅长，数据让我困惑",s:[1,1,1,1]},{t:"偶尔能发现，但不稳定",s:[2,2,2,2]},{t:"能发现主要规律",s:[3,3,3,3]},{t:"能快速洞察深层规律和趋势",s:[4,4,4,4]}]},
+  {q:"学习一门新语言或专业术语时：",opts:[{t:"非常吃力，很难记住",s:[1,1,1,1]},{t:"需要反复学习才能记住",s:[2,2,2,2]},{t:"能够掌握，但需要时间",s:[3,3,3,3]},{t:"学习速度快，能快速掌握",s:[4,4,4,4]}]},
+  {q:"解决一个复杂的数学问题，你会：",opts:[{t:"放弃，数学不是我的强项",s:[1,1,1,1]},{t:"尝试，但经常出错",s:[2,2,2,2]},{t:"系统分析，多数能解决",s:[3,3,3,3]},{t:"迅速找到解题思路，高效完成",s:[4,4,4,4]}]},
+  {q:"你的抽象思维能力如何？",opts:[{t:"很难理解抽象概念",s:[1,1,1,1]},{t:"能理解，但需要具体例子",s:[2,2,2,2]},{t:"能较好地处理抽象概念",s:[3,3,3,3]},{t:"擅长抽象思维，能建立理论模型",s:[4,4,4,4]}]},
+  {q:"在头脑中模拟不同方案的结果，你能做到：",opts:[{t:"很难，不善于预测",s:[1,1,1,1]},{t:"能想到1-2种可能性",s:[2,2,2,2]},{t:"能想到多种可能性",s:[3,3,3,3]},{t:"能系统地模拟多种路径并评估",s:[4,4,4,4]}]},
+  {q:"进行批判性思维（质疑假设）的能力：",opts:[{t:"倾向于接受权威，很少质疑",s:[1,1,1,1]},{t:"偶尔质疑，但不深入",s:[2,2,2,2]},{t:"能独立质疑，分析问题",s:[3,3,3,3]},{t:"善于发现假设中的漏洞，独立思考",s:[4,4,4,4]}]},
+  {q:"你的创造力和发散思维如何？",opts:[{t:"缺乏创意，按固定思路思考",s:[1,1,1,1]},{t:"偶尔有新想法，但不多",s:[2,2,2,2]},{t:"有一定创意，能想到新方案",s:[3,3,3,3]},{t:"创意丰富，思维活跃，善于创新",s:[4,4,4,4]}]},
+  {q:"掌握一项复杂技能（如乐器、编程）时：",opts:[{t:"很慢，需要大量重复练习",s:[1,1,1,1]},{t:"一般速度，能逐渐掌握",s:[2,2,2,2]},{t:"较快，能理解底层逻辑",s:[3,3,3,3]},{t:"很快，能举一反三并深度优化",s:[4,4,4,4]}]},
+  {q:"同时处理多个任务的能力：",opts:[{t:"只能专注一件事，多任务混乱",s:[1,1,1,1]},{t:"勉强应付，效率下降",s:[2,2,2,2]},{t:"能有效管理多任务",s:[3,3,3,3]},{t:"多任务处理游刃有余，效率不降",s:[4,4,4,4]}]},
+  {q:"通过类比理解新概念的能力：",opts:[{t:"很难，类比让我更困惑",s:[1,1,1,1]},{t:"偶尔有效，但不稳定",s:[2,2,2,2]},{t:"能通过类比理解新事物",s:[3,3,3,3]},{t:"善于建立类比，快速掌握新概念",s:[4,4,4,4]}]},
+  {q:"设计或规划一个复杂项目时：",opts:[{t:"缺乏整体规划能力",s:[1,1,1,1]},{t:"能做基本规划，但不全面",s:[2,2,2,2]},{t:"能做出有效的系统规划",s:[3,3,3,3]},{t:"规划精密，考虑周全，执行高效",s:[4,4,4,4]}]},
+  {q:"在压力下保持清晰思考的能力：",opts:[{t:"压力下思维混乱，无法正常思考",s:[1,1,1,1]},{t:"受一定影响，效率下降",s:[2,2,2,2]},{t:"能保持基本清晰",s:[3,3,3,3]},{t:"压力下思维更聚焦，表现更好",s:[4,4,4,4]}]},
+  {q:"阅读一段复杂文章后的理解深度：",opts:[{t:"只能理解字面意思",s:[1,1,1,1]},{t:"能理解主要内容",s:[2,2,2,2]},{t:"能理解深层含义",s:[3,3,3,3]},{t:"能洞察作者意图和文章结构",s:[4,4,4,4]}]},
+  {q:"解决问题时，你倾向于：",opts:[{t:"用固定的方法，不求变化",s:[1,1,1,1]},{t:"尝试几种方法",s:[2,2,2,2]},{t:"灵活运用多种策略",s:[3,3,3,3]},{t:"创造性地整合多种方法，找到最优解",s:[4,4,4,4]}]},
+  {q:"从错误和失败中学习的能力：",opts:[{t:"很少反思，重复同样错误",s:[1,1,1,1]},{t:"偶尔反思，但改变不大",s:[2,2,2,2]},{t:"能从错误中学习改进",s:[3,3,3,3]},{t:"深入复盘，系统改进，快速成长",s:[4,4,4,4]}]},
+  {q:"你能快速在脑海中计算和推导吗？",opts:[{t:"不能，需要纸笔辅助",s:[1,1,1,1]},{t:"简单计算可以，复杂的需要工具",s:[2,2,2,2]},{t:"能进行相当复杂的心算",s:[3,3,3,3]},{t:"心算能力强，能快速推导",s:[4,4,4,4]}]},
+  {q:"整合不同领域知识解决问题的能力：",opts:[{t:"很难整合，各领域知识孤立",s:[1,1,1,1]},{t:"偶尔能做到，但不系统",s:[2,2,2,2]},{t:"能将不同知识有效整合",s:[3,3,3,3]},{t:"擅长跨领域整合，创造突破性解决方案",s:[4,4,4,4]}]},
+  {q:"掌握复杂系统（如经济、生态）的能力：",opts:[{t:"很难理解复杂系统",s:[1,1,1,1]},{t:"能理解基本部分",s:[2,2,2,2]},{t:"能理解主要机制",s:[3,3,3,3]},{t:"能深度理解系统动态和涌现行为",s:[4,4,4,4]}]},
+  {q:"你是否善于从不同角度看同一问题？",opts:[{t:"通常只有一个视角",s:[1,1,1,1]},{t:"能想到2个视角",s:[2,2,2,2]},{t:"能主动寻找多个视角",s:[3,3,3,3]},{t:"自然地从多维度审视，全面思考",s:[4,4,4,4]}]},
+  {q:"识别和理解因果关系的能力：",opts:[{t:"难以区分原因和结果",s:[1,1,1,1]},{t:"能识别明显的因果",s:[2,2,2,2]},{t:"能分析复杂的因果链",s:[3,3,3,3]},{t:"能洞察隐藏的因果，预见连锁效应",s:[4,4,4,4]}]},
+  {q:"你是否善于用图表和可视化理解信息？",opts:[{t:"图表让我更困惑",s:[1,1,1,1]},{t:"能理解简单图表",s:[2,2,2,2]},{t:"能有效运用可视化工具",s:[3,3,3,3]},{t:"善于从可视化中发现隐藏规律",s:[4,4,4,4]}]},
+  {q:"在不完整信息下做出合理判断：",opts:[{t:"无法判断，必须获得所有信息",s:[1,1,1,1]},{t:"勉强判断，但不确定",s:[2,2,2,2]},{t:"能基于现有信息做出合理判断",s:[3,3,3,3]},{t:"善于利用有限信息推断，判断准确",s:[4,4,4,4]}]},
+  {q:"你的语言学习和理解能力：",opts:[{t:"语言学习困难，理解力弱",s:[1,1,1,1]},{t:"一般，需要反复练习",s:[2,2,2,2]},{t:"良好，能有效沟通",s:[3,3,3,3]},{t:"出色，能精准理解和运用语言",s:[4,4,4,4]}]},
+  {q:"你是否善于发现事物之间的关联？",opts:[{t:"很少能找到关联",s:[1,1,1,1]},{t:"能找到明显关联",s:[2,2,2,2]},{t:"能发现不明显的关联",s:[3,3,3,3]},{t:"善于发现跨领域的深层联系",s:[4,4,4,4]}]},
+  {q:"持续专注于复杂任务的能力：",opts:[{t:"很难长时间专注",s:[1,1,1,1]},{t:"能专注一段时间，然后分心",s:[2,2,2,2]},{t:"能保持较长时间的专注",s:[3,3,3,3]},{t:"高度专注，进入深度流动状态",s:[4,4,4,4]}]},
+  {q:"解决歧义和模糊问题的能力：",opts:[{t:"模糊性让我焦虑，无法处理",s:[1,1,1,1]},{t:"努力应对，但效果不好",s:[2,2,2,2]},{t:"能处理一定程度的模糊",s:[3,3,3,3]},{t:"能在模糊中找到框架，有效解决",s:[4,4,4,4]}]},
+  {q:"你的归纳和演绎推理能力：",opts:[{t:"不善于推理，容易出错",s:[1,1,1,1]},{t:"简单推理可以，复杂的不行",s:[2,2,2,2]},{t:"能进行有效的推理",s:[3,3,3,3]},{t:"推理严密，能识别推理中的谬误",s:[4,4,4,4]}]},
+  {q:"接受和理解反常识的观点：",opts:[{t:"很难接受，坚持常识判断",s:[1,1,1,1]},{t:"勉强接受，但不深入思考",s:[2,2,2,2]},{t:"能开放地分析反常识观点",s:[3,3,3,3]},{t:"善于思考违反直觉的观点，拓展认知",s:[4,4,4,4]}]},
+  {q:"你是否善于将抽象变成具体？",opts:[{t:"只能抽象思考，难以落地",s:[1,1,1,1]},{t:"能给出一些具体例子",s:[2,2,2,2]},{t:"能有效转化抽象为具体",s:[3,3,3,3]},{t:"善于用生动案例呈现深刻原理",s:[4,4,4,4]}]},
+  {q:"面对全新挑战时，学习和适应速度：",opts:[{t:"很慢，需要大量时间",s:[1,1,1,1]},{t:"一般，逐步适应",s:[2,2,2,2]},{t:"较快，能快速上手",s:[3,3,3,3]},{t:"极快，能迅速掌握核心",s:[4,4,4,4]}]},
+  {q:"你是否能有效估算和近似计算？",opts:[{t:"不善于估算，偏差很大",s:[1,1,1,1]},{t:"估算一般，偶尔准确",s:[2,2,2,2]},{t:"能给出合理的估算",s:[3,3,3,3]},{t:"估算精准，误差极小",s:[4,4,4,4]}]},
+  {q:"整体来说，你的思维灵活性如何？",opts:[{t:"思维固化，不善于转换",s:[1,1,1,1]},{t:"一般，偶尔能灵活",s:[2,2,2,2]},{t:"较灵活，能适应变化",s:[3,3,3,3]},{t:"高度灵活，随时切换思维模式",s:[4,4,4,4]}]}
+];
+
+let curQ=0, answers=[], scores={logic:0,lang:0,space:0,create:0};
+
+function checkPW(){
+  const v=document.getElementById('pw-input').value.trim();
+  if(PASSWORDS.includes(v)){show('page-quiz');renderQ();}
+  else alert('密码错误，请重试！');
+}
+function show(id){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.getElementById(id).classList.add('active');}
+function renderQ(){
+  const q=Qs[curQ];
+  document.getElementById('q-num').textContent=`第 ${curQ+1} 题 / 共 ${Qs.length} 题`;
+  document.getElementById('q-text').textContent=q.q;
+  document.getElementById('prog').style.width=`${(curQ+1)/Qs.length*100}%`;
+  const oc=document.getElementById('opts');oc.innerHTML='';
+  q.opts.forEach((o,i)=>{
+    const d=document.createElement('div');
+    d.className='opt'+(answers[curQ]===i?' selected':'');
+    d.textContent=o.t;
+    d.onclick=()=>{answers[curQ]=i;document.querySelectorAll('.opt').forEach((el,j)=>el.classList.toggle('selected',j===i));};
+    oc.appendChild(d);
+  });
+  document.getElementById('btn-prev').style.visibility=curQ===0?'hidden':'visible';
+  document.getElementById('btn-next').textContent=curQ===Qs.length-1?'查看结果':'下一题';
+}
+function prevQ(){if(curQ>0){curQ--;renderQ();}}
+function nextQ(){
+  if(answers[curQ]===undefined){alert('请选择一个选项！');return;}
+  if(curQ<Qs.length-1){curQ++;renderQ();}
+  else{calcResult();showResult();}
+}
+function calcResult(){
+  scores={logic:0,lang:0,space:0,create:0};
+  Qs.forEach((q,i)=>{
+    const s=q.opts[answers[i]].s;
+    scores.logic+=s[0];scores.lang+=s[1];scores.space+=s[2];scores.create+=s[3];
+  });
+  const max=Qs.length*4;
+  scores.logic=Math.round(scores.logic/max*100);
+  scores.lang=Math.round(scores.lang/max*100);
+  scores.space=Math.round(scores.space/max*100);
+  scores.create=Math.round(scores.create/max*100);
+}
+function showResult(){
+  show('page-result');
+  const total=Math.round((scores.logic+scores.lang+scores.space+scores.create)/4);
+  document.getElementById('total-score').textContent=total;
+  renderDims();renderAnalysis(total);renderTheories();renderActions();renderQuote();
+}
+function lv(s){return s>=80?'卓越':s>=65?'优秀':s>=45?'良好':'待发展';}
+function renderDims(){
+  const dims=[
+    {name:'逻辑推理',score:scores.logic,desc:'逻辑推理能力是智力的核心，包括归纳、演绎、抽象思维和批判性思考。高分者能迅速识别规律，解构复杂问题，在不确定中找到清晰路径。'},
+    {name:'语言能力',score:scores.lang,desc:'语言能力包括阅读理解、表达、学习新词汇和语言迁移能力。高分者能精准理解和运用语言，快速掌握新的语言系统，用语言推动思维深化。'},
+    {name:'空间思维',score:scores.space,desc:'空间思维指在脑海中操作和转换图形、理解三维结构的能力。高分者擅长可视化，善于用图形和空间关系思考，在工程、艺术、建筑等领域往往表现突出。'},
+    {name:'创造力',score:scores.create,desc:'创造力包括发散思维、跨领域整合和创新解题能力。高分者思维活跃，善于打破惯例，在多个领域之间建立独特联系，产生原创性的解决方案。'}
+  ];
+  document.getElementById('dims').innerHTML=dims.map(d=>`
+    <div class="dim-item">
+      <div class="dim-row"><span class="dim-name">${d.name}</span><span class="dim-type">${lv(d.score)}</span></div>
+      <div class="dim-score">${d.score} 分</div>
+      <p class="dim-desc">${d.desc}</p>
+      <div class="pb"><div class="pb-fill" style="width:${d.score}%"></div></div>
+    </div>`).join('');
+}
+function renderAnalysis(total){
+  let mods;
+  if(total>=75){mods=[
+    {t:'智力卓越：多维认知优势',c:'你的综合智力水平出众，在多个认知维度上均表现卓越。你能快速处理复杂信息，建立清晰的思维模型，并在压力下保持高效思考。你的学习速度和知识迁移能力让你能够在新领域迅速站稳脚跟。这种全面的认知能力是你最宝贵的资产，为你在各领域取得成就提供了强大的智力基础。'},
+    {t:'思维深度：洞察规律的能力',c:'你拥有卓越的模式识别和规律洞察能力。无论是数学规律、逻辑推理还是复杂系统分析，你都能迅速抓住本质。这种能力让你在解决问题时往往能找到他人忽视的关键路径。你的思维不满足于表面现象，总是深入挖掘背后的原理和机制，这使你能在同等条件下产生更高质量的思考成果。'},
+    {t:'创新融合：跨界整合的天赋',c:'你具备强大的跨领域整合能力，能将不同学科的知识和方法论融合，产生突破性的解决方案。这种创造性思维让你不局限于固有框架，而是敢于质疑假设，开辟新路径。在团队中，你往往能提出最具创意和价值的观点，成为推动创新的核心力量。'},
+    {t:'持续精进：永不满足的求知欲',c:'高智力者最大的特征之一是对知识永不枯竭的好奇心。你对新事物充满探索欲，学习对你来说是享受而非负担。保持这种求知态度，持续涉猎不同领域，将使你的智力优势不断复利增长。建议你定期挑战更高难度的问题，将思维能力推向新的边界。'}
+  ];}else if(total>=55){mods=[
+    {t:'智力良好：均衡发展的认知能力',c:'你的综合智力水平良好，在大多数认知任务上能够有效完成。你的逻辑思维、语言理解和问题解决能力为你的学习和工作提供了可靠支撑。虽然还有提升空间，但你已经具备了应对大多数智力挑战的基础能力，通过系统训练可以实现显著突破。'},
+    {t:'学习潜力：待挖掘的认知资源',c:'你的智力潜力尚未被充分开发。许多人在20-40岁之间，通过系统的认知训练仍能显著提升智力表现。关键在于找到你的优势领域并深度发展，同时补强薄弱环节。神经科学证明，大脑具有高度可塑性，持续的智力挑战能促进神经连接的建立和强化。'},
+    {t:'思维训练：科学提升的路径',c:'你的智力水平可以通过系统训练得到提升。建议每天进行逻辑题训练、阅读高质量书籍、学习新技能，并刻意训练批判性思维。这些方法经科学研究证实，能有效提升流体智力和晶体智力。关键是持续性和系统性，短期冲刺效果有限，长期坚持才能看到真正的提升。'},
+    {t:'发挥优势：找到你的智力舞台',c:'每个人的智力结构不同，重要的是找到你的认知优势并充分发挥。霍华德·加德纳的多元智能理论告诉我们，智力远不只是考试分数。你可能在音乐、运动、人际、自然等方面拥有特殊天赋。了解并发展你的独特优势，比在弱项上过度投入更能创造非凡成就。'}
+  ];}else{mods=[
+    {t:'智力待发展：成长从现在开始',c:'你的综合智力测评分数偏低，但这不代表你无法实现智力上的提升。研究表明，大脑神经可塑性持续存在，认知能力可以通过刻意训练获得显著改善。认识到自己的现状，正是改变的起点。接下来的行动计划将帮助你系统地提升认知能力，一步一步走向更好的自己。'},
+    {t:'基础强化：构建认知底层能力',c:'提升智力的关键在于强化基础认知能力：注意力、工作记忆和处理速度。这三项能力是所有高级思维的基础。建议每天进行注意力训练（如冥想）、记忆训练（如记忆宫殿）和简单逻辑题练习。这些基础训练效果慢但扎实，3个月后你将感受到明显的认知改善。'},
+    {t:'阅读习惯：开启智力成长最优路径',c:'大量研究证明，持续阅读是提升综合智力最有效的方式之一。每天阅读30-60分钟高质量书籍（科学、哲学、历史、文学），能显著提升语言能力、批判性思维和知识广度。选择略高于你当前水平的书籍，给大脑施加适度挑战。一年坚持下来，你的认知水平将有质的提升。'},
+    {t:'实践驱动：在解决问题中提升智力',c:'智力最好的训练场是真实问题的解决。主动寻找具有挑战性的项目，无论是工作中的复杂任务还是生活中的有趣问题，刻意地运用逻辑分析、批判性思考来解决它们。每解决一个高难度问题，都是对神经网络的一次有效训练。将学习与实践结合，是提升智力最快速的路径之一。'}
+  ];}
+  document.getElementById('analysis').innerHTML=mods.map(m=>`<div class="ana-mod"><h3 class="ana-mod-title">${m.t}</h3><p class="ana-mod-text">${m.c}</p></div>`).join('');
+}
+function renderTheories(){
+  const ts=[
+    {t:'斯皮尔曼的g因素理论',d:'斯皮尔曼1904年提出智力g因素理论，认为存在一种通用智力因子，它渗透到所有认知任务中。高g因素意味着在多种认知任务上均表现良好。现代研究表明，g因素与大脑额叶顶叶网络的效率密切相关，并受遗传和环境双重影响。神经影像学研究进一步证实，高g因素个体的神经信号传导更为高效。',s:'Spearman, C. (1904). General intelligence. American Journal of Psychology.'},
+    {t:'霍华德·加德纳多元智能理论',d:'加德纳1983年提出多元智能理论，将智能分为逻辑数学、语言、空间、音乐、身体运动、人际、内省和自然智能等多个维度。这一理论挑战了传统IQ测试的单一化，强调每个人都有独特的智能组合。教育学研究表明，基于多元智能的个性化教学方式能显著提升学生的学习效果和自信心。',s:'Gardner, H. (1983). Frames of Mind: The Theory of Multiple Intelligences.'},
+    {t:'流体智力与晶体智力理论',d:'卡特尔和霍恩区分了流体智力（解决新问题的能力，与年龄正相关至成年）和晶体智力（积累的知识和技能，终身可增长）。研究表明，流体智力可以通过认知训练得到提升，而晶体智力随学习积累持续增长。这一理论为终身学习提供了科学依据，表明人在任何年龄都可以提升认知能力。',s:'Cattell, R. B. (1971). Abilities: Their Structure, Growth, and Action.'}
+  ];
+  document.getElementById('theories').innerHTML=ts.map(t=>`<div class="theory-item"><h3 class="theory-title">${t.t}</h3><p class="theory-desc">${t.d}</p><p class="theory-src">来源：${t.s}</p></div>`).join('');
+}
+function renderActions(){
+  const acts=[
+    {t:'每日逻辑训练15分钟',c:'系统地练习逻辑推理题，包括数列规律、图形推理、语言逻辑和批判性思维题。推荐使用Lumosity或BrainHQ等认知训练平台，这些工具基于神经科学研究，能有针对性地提升特定认知能力。关键是坚持每天练习，研究表明持续4-8周后，流体智力会有可测量的提升。'},
+    {t:'建立深度阅读习惯',c:'每周阅读1-2本高质量书籍，涵盖科学、历史、哲学、传记等不同领域。阅读时主动思考：作者的核心论点是什么？逻辑是否严密？有哪些假设？如何与其他知识连接？这种主动式阅读能同时提升多项认知能力。建立读书笔记，定期回顾和整合，将阅读转化为持久的认知资产。'},
+    {t:'学习一门新技能或语言',c:'学习一项全新技能（编程、乐器、第二外语、围棋等）是提升认知灵活性最有效的方法之一。新技能的学习会激活大脑中未被充分使用的区域，形成新的神经连接，直接提升处理速度和学习迁移能力。研究表明，双语者的认知控制能力显著优于单语者，学习第二语言是提升整体智力的高性价比投资。'},
+    {t:'培养费曼学习法',c:'费曼学习法：选择一个想深度理解的概念，尝试用最简单的语言把它解释给一个外行人听。遇到解释不清楚的地方，返回原材料深度学习，直到能流畅解释为止。这种方法强迫你真正理解而非仅仅记忆，是检验和加深理解的最有效工具。定期选取复杂主题进行费曼练习，你的知识深度和思维清晰度将显著提升。'},
+    {t:'每周挑战一个高难度问题',c:'主动寻找超出当前能力水平的挑战性问题，可以是数学难题、复杂的设计挑战、哲学思辨或跨学科问题。在解决过程中记录你的思路，即使最终无法独立解决也要坚持思考，寻求解答后深度复盘。这种刻意挑战认知边界的方式，是提升流体智力最有效的方法之一，也是许多顶级学者和科学家持续保持思维锐度的秘诀。'}
+  ];
+  document.getElementById('actions').innerHTML=acts.map((a,i)=>`<div class="action-item"><h3 class="action-title"><span class="action-num">${i+1}</span>${a.t}</h3><p class="action-text">${a.c}</p></div>`).join('');
+}
+function renderQuote(){
+  const qs=[
+    {t:'"智力的真正标志不是知识，而是想象力。"',a:'阿尔伯特·爱因斯坦'},
+    {t:'"学而不思则罔，思而不学则殆。"',a:'孔子'},
+    {t:'"我没有特别的才能，只有强烈的好奇心。"',a:'阿尔伯特·爱因斯坦'},
+    {t:'"任何足够先进的技术都与魔法无异——而智力，正是人类的魔法。"',a:'阿瑟·C·克拉克'}
+  ];
+  const q=qs[Math.floor(Math.random()*qs.length)];
+  document.getElementById('qt-text').textContent=q.t;
+  document.getElementById('qt-author').textContent=`—— ${q.a}`;
+}
+
+function initParticles(){
+  const canvas=document.getElementById('particles-canvas');
+  if(!canvas)return;
+  const ctx=canvas.getContext('2d');
+  if(!ctx)return;
+  function resize(){canvas.width=window.innerWidth;canvas.height=window.innerHeight;}
+  resize();
+  const particles=Array.from({length:80},()=>({
+    x:Math.random()*canvas.width,y:Math.random()*canvas.height,
+    vx:(Math.random()-.5)*.5,vy:(Math.random()-.5)*.5,
+    r:Math.random()*2.5+.8,
+    c:['#60a5fa','#3b82f6','#93c5fd'][Math.floor(Math.random()*3)],
+    a:Math.random()*.5+.3
+  }));
+  function draw(){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    particles.forEach((p,i)=>{
+      p.x+=p.vx;p.y+=p.vy;
+      if(p.x<0||p.x>canvas.width)p.vx*=-1;
+      if(p.y<0||p.y>canvas.height)p.vy*=-1;
+      ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+      ctx.fillStyle=p.c;ctx.globalAlpha=p.a;ctx.fill();ctx.globalAlpha=1;
+      for(let j=i+1;j<particles.length;j++){
+        const q=particles[j],dx=p.x-q.x,dy=p.y-q.y,dist=Math.sqrt(dx*dx+dy*dy);
+        if(dist<140){ctx.beginPath();ctx.moveTo(p.x,p.y);ctx.lineTo(q.x,q.y);ctx.strokeStyle=p.c;ctx.lineWidth=.5;ctx.globalAlpha=(140-dist)/140*.25;ctx.stroke();ctx.globalAlpha=1;}
+      }
+    });
+    requestAnimationFrame(draw);
+  }
+  draw();
+  window.addEventListener('resize',resize);
+}
+
+document.addEventListener('DOMContentLoaded',initParticles);
+document.getElementById('pw-input').addEventListener('keypress',e=>{if(e.key==='Enter')checkPW();});
+</script>
+</body>
+</html>

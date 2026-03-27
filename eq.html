@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>情商深度测评</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Noto Sans SC', sans-serif; background: #0a0a14; color: #fff; min-height: 100vh; overflow-x: hidden; }
+        #particles-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
+        .container { position: relative; z-index: 1; max-width: 900px; margin: 0 auto; padding: 40px 20px; }
+        .page { display: none; animation: fadeIn 0.5s ease; }
+        .page.active { display: block; }
+        @keyframes fadeIn { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
+
+        /* 首页 */
+        .home-wrap { text-align: center; padding-top: 60px; }
+        .top-badge { display: inline-block; background: linear-gradient(135deg,#f472b6,#ec4899); padding: 8px 24px; border-radius: 30px; font-size: .95rem; font-weight: 600; margin-bottom: 30px; box-shadow: 0 4px 15px rgba(244,114,182,.35); }
+        .main-title { font-family: 'Noto Serif SC',serif; font-size: 3.5rem; background: linear-gradient(135deg,#f9a8d4,#f472b6,#ec4899); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; filter: drop-shadow(0 0 25px rgba(244,114,182,.4)); line-height: 1.2; margin-bottom: 16px; }
+        .sub-title { font-size: 1.25rem; color: #ccc; margin-bottom: 12px; }
+        .description { font-size: 1rem; color: #999; line-height: 1.8; max-width: 680px; margin: 0 auto 28px; }
+        .feature-tags { display: flex; justify-content: center; gap: 16px; flex-wrap: wrap; margin-bottom: 40px; }
+        .ftag { background: rgba(244,114,182,.1); border: 1px solid rgba(244,114,182,.3); padding: 8px 20px; border-radius: 20px; font-size: .9rem; color: #f472b6; }
+        .pw-box { max-width: 460px; margin: 0 auto 50px; background: rgba(20,20,30,.7); backdrop-filter: blur(10px); border: 2px solid rgba(244,114,182,.35); border-radius: 20px; padding: 45px; box-shadow: 0 0 60px rgba(244,114,182,.25); }
+        .pw-label { text-align: center; color: #f472b6; font-size: 1.05rem; margin-bottom: 16px; display: block; }
+        .pw-input { width: 100%; padding: 16px; font-size: 1.2rem; background: rgba(10,10,20,.9); border: 2px solid #333; border-radius: 12px; color: #f472b6; text-align: center; margin-bottom: 22px; transition: all .3s; }
+        .pw-input:focus { outline: none; border-color: #f472b6; box-shadow: 0 0 20px rgba(244,114,182,.35); }
+        .pw-input::placeholder { color: rgba(244,114,182,.3); }
+        .btn-start { width: 100%; padding: 16px; font-size: 1.1rem; font-weight: 700; border: none; border-radius: 12px; cursor: pointer; background: linear-gradient(135deg,#f472b6,#ec4899); color: #fff; letter-spacing: 2px; transition: all .3s; box-shadow: 0 6px 20px rgba(244,114,182,.4); }
+        .btn-start:hover { transform: translateY(-3px); box-shadow: 0 10px 30px rgba(244,114,182,.55); }
+        .fc-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(240px,1fr)); gap: 20px; padding: 0 10px; }
+        .fc-card { background: rgba(20,20,30,.6); backdrop-filter: blur(8px); border: 1px solid rgba(244,114,182,.2); border-radius: 16px; padding: 28px 22px; text-align: center; transition: all .3s; }
+        .fc-card:hover { transform: translateY(-5px); border-color: rgba(244,114,182,.5); box-shadow: 0 10px 30px rgba(244,114,182,.2); }
+        .fc-icon { font-size: 2.5rem; margin-bottom: 14px; }
+        .fc-title { font-size: 1.1rem; font-weight: 600; color: #f472b6; margin-bottom: 8px; }
+        .fc-desc { font-size: .9rem; color: #999; line-height: 1.6; }
+
+        /* 题目页 */
+        h1.qt { font-family: 'Noto Serif SC',serif; font-size: 2rem; color: #f472b6; text-align: center; margin-bottom: 8px; text-shadow: 0 0 25px rgba(244,114,182,.4); }
+        .qt-sub { text-align: center; color: #999; margin-bottom: 25px; }
+        .prog-bar { height: 8px; background: rgba(255,255,255,.1); border-radius: 10px; margin-bottom: 28px; overflow: hidden; }
+        .prog-fill { height: 100%; background: linear-gradient(90deg,#f472b6,#ec4899); border-radius: 10px; transition: width .5s; }
+        .q-card { background: rgba(20,20,30,.8); border: 2px solid rgba(244,114,182,.3); border-radius: 20px; padding: 38px; margin-bottom: 24px; }
+        .q-num { display: inline-block; background: linear-gradient(135deg,#f472b6,#ec4899); padding: 5px 16px; border-radius: 15px; font-size: .85rem; margin-bottom: 18px; }
+        .q-text { font-size: 1.35rem; line-height: 1.8; color: #fff; margin-bottom: 28px; }
+        .options { display: grid; gap: 14px; }
+        .opt { background: rgba(255,255,255,.04); border: 2px solid rgba(244,114,182,.2); border-radius: 12px; padding: 18px 22px; cursor: pointer; font-size: 1.05rem; transition: all .3s; }
+        .opt:hover { background: rgba(244,114,182,.1); border-color: #f472b6; transform: translateX(5px); }
+        .opt.selected { background: rgba(244,114,182,.2); border-color: #f472b6; box-shadow: 0 0 18px rgba(244,114,182,.3); }
+        .nav-btns { display: flex; gap: 14px; margin-top: 22px; }
+        .btn-nav { flex: 1; padding: 14px; font-size: 1rem; background: rgba(244,114,182,.1); border: 2px solid #f472b6; color: #f472b6; border-radius: 10px; cursor: pointer; font-weight: 600; transition: all .3s; }
+        .btn-nav:hover { background: #f472b6; color: #fff; }
+        .btn-nav:disabled { opacity: .3; cursor: not-allowed; }
+
+        /* 结果页 */
+        .res-header { text-align: center; padding: 30px; background: rgba(20,20,30,.8); border: 2px solid rgba(244,114,182,.3); border-radius: 20px; margin-bottom: 28px; }
+        .res-title { font-family: 'Noto Serif SC',serif; font-size: 2.5rem; color: #f472b6; margin-bottom: 8px; }
+        .res-sub { font-size: 1.1rem; color: #999; margin-bottom: 18px; }
+        .score-big { font-size: 3.5rem; font-weight: 700; color: #f472b6; text-shadow: 0 0 30px rgba(244,114,182,.6); }
+        .score-lbl { color: #aaa; font-size: 1rem; margin-top: 6px; }
+        .res-section { background: rgba(20,20,30,.8); border: 2px solid rgba(244,114,182,.3); border-radius: 20px; padding: 35px; margin-bottom: 26px; }
+        .sec-title { font-family: 'Noto Serif SC',serif; font-size: 1.7rem; color: #f472b6; margin-bottom: 22px; display: flex; align-items: center; gap: 10px; }
+        .dim-item { background: rgba(255,255,255,.03); padding: 20px; border-radius: 14px; border-left: 4px solid #f472b6; margin-bottom: 18px; }
+        .dim-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+        .dim-name { font-size: 1.1rem; font-weight: 600; }
+        .dim-type { font-size: 1rem; color: #f472b6; font-weight: 600; }
+        .dim-score { font-size: 1.8rem; font-weight: 700; color: #f472b6; margin: 6px 0; }
+        .dim-desc { color: #b0b0b0; font-size: .95rem; line-height: 1.7; margin-bottom: 12px; }
+        .pb { height: 9px; background: rgba(255,255,255,.08); border-radius: 8px; overflow: hidden; }
+        .pb-fill { height: 100%; background: linear-gradient(90deg,#f472b6,#ec4899); border-radius: 8px; transition: width .6s; }
+        .ana-mod { background: rgba(255,255,255,.02); padding: 24px; border-radius: 14px; border: 1px solid rgba(244,114,182,.18); margin-bottom: 16px; }
+        .ana-mod-title { font-size: 1.2rem; color: #f472b6; font-weight: 600; margin-bottom: 12px; }
+        .ana-mod-text { color: #c0c0c0; font-size: .97rem; line-height: 1.85; }
+        .theory-item { padding: 22px; border-radius: 14px; border-left: 4px solid #f472b6; background: rgba(255,255,255,.02); margin-bottom: 16px; }
+        .theory-title { font-size: 1.1rem; color: #f472b6; font-weight: 600; margin-bottom: 10px; }
+        .theory-desc { color: #b0b0b0; font-size: .95rem; line-height: 1.7; }
+        .theory-src { color: #f472b6; font-size: .85rem; margin-top: 8px; font-style: italic; }
+        .action-item { background: rgba(255,255,255,.03); padding: 24px; border-radius: 14px; border: 1px solid rgba(244,114,182,.18); margin-bottom: 16px; transition: all .3s; }
+        .action-item:hover { transform: translateY(-3px); border-color: rgba(244,114,182,.45); box-shadow: 0 8px 25px rgba(244,114,182,.18); }
+        .action-title { font-size: 1.15rem; color: #f472b6; font-weight: 600; margin-bottom: 10px; display: flex; align-items: center; gap: 10px; }
+        .action-num { background: linear-gradient(135deg,#f472b6,#ec4899); width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: .85rem; font-weight: 700; flex-shrink: 0; }
+        .action-text { color: #b0b0b0; font-size: .95rem; line-height: 1.75; }
+        .quote-box { text-align: center; padding: 38px; background: rgba(244,114,182,.05); border: 2px solid rgba(244,114,182,.25); border-radius: 18px; margin-top: 26px; }
+        .quote-t { font-family: 'Noto Serif SC',serif; font-size: 1.45rem; color: #fff; line-height: 1.8; margin-bottom: 18px; font-style: italic; }
+        .quote-a { color: #f472b6; font-size: 1.05rem; }
+        .btn-restart { width: 100%; padding: 16px; font-size: 1.05rem; font-weight: 700; border: none; border-radius: 12px; cursor: pointer; background: linear-gradient(135deg,#f472b6,#ec4899); color: #fff; letter-spacing: 2px; transition: all .3s; margin-top: 28px; box-shadow: 0 6px 20px rgba(244,114,182,.4); }
+        .btn-restart:hover { transform: translateY(-3px); }
+
+        @media(max-width:768px) {
+            .main-title { font-size: 2.4rem; }
+            .pw-box { padding: 28px 20px; }
+            .fc-grid { grid-template-columns: 1fr; }
+            .q-card { padding: 26px 20px; }
+            .q-text { font-size: 1.15rem; }
+            .nav-btns { flex-direction: column; }
+            .res-section { padding: 24px 18px; }
+        }
+    </style>
+</head>
+<body>
+<canvas id="particles-canvas"></canvas>
+<div class="container">
+
+  <!-- 密码页 -->
+  <div class="page active" id="page-pw">
+    <div class="home-wrap">
+      <div class="top-badge">💖 专业情商深度测评</div>
+      <h1 class="main-title">情商深度测评</h1>
+      <p class="sub-title">探索你的情绪智慧，提升人际影响力</p>
+      <p class="description">情商（EQ）是衡量一个人识别、理解、管理和运用情绪能力的重要指标。本测评全面评估你的自我认知、自我管理、社交意识和关系管理四大核心维度，提供科学提升建议。</p>
+      <div class="feature-tags">
+        <span class="ftag">📊 40道专业题目</span>
+        <span class="ftag">⏱️ 约12分钟</span>
+        <span class="ftag">🎯 深度情商分析</span>
+      </div>
+      <div class="pw-box">
+        <label class="pw-label">测评密码</label>
+        <input class="pw-input" type="password" id="pw-input" placeholder="请输入测评密码">
+        <button class="btn-start" onclick="checkPW()">开始测评</button>
+      </div>
+      <div class="fc-grid">
+        <div class="fc-card"><div class="fc-icon">🧠</div><h3 class="fc-title">自我认知</h3><p class="fc-desc">深度了解你的情绪模式与自我感知能力</p></div>
+        <div class="fc-card"><div class="fc-icon">⚖️</div><h3 class="fc-title">情绪管理</h3><p class="fc-desc">掌握调节情绪、从容应对压力的关键能力</p></div>
+        <div class="fc-card"><div class="fc-icon">🤝</div><h3 class="fc-title">关系管理</h3><p class="fc-desc">提升社交技巧与高质量人际关系建立能力</p></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 题目页 -->
+  <div class="page" id="page-quiz">
+    <h1 class="qt">情商深度测评</h1>
+    <p class="qt-sub">请根据真实情况作答，每题只选一项</p>
+    <div class="prog-bar"><div class="prog-fill" id="prog"></div></div>
+    <div class="q-card">
+      <span class="q-num" id="q-num">第 1 题 / 共 40 题</span>
+      <p class="q-text" id="q-text"></p>
+      <div class="options" id="opts"></div>
+    </div>
+    <div class="nav-btns">
+      <button class="btn-nav" id="btn-prev" onclick="prevQ()">上一题</button>
+      <button class="btn-nav" id="btn-next" onclick="nextQ()">下一题</button>
+    </div>
+  </div>
+
+  <!-- 结果页 -->
+  <div class="page" id="page-result">
+    <div class="res-header">
+      <h1 class="res-title">情商测评报告</h1>
+      <p class="res-sub">基于40道专业题目的深度分析</p>
+      <div class="score-big" id="total-score">—</div>
+      <p class="score-lbl">情商总分 / 100</p>
+    </div>
+    <div class="res-section"><h2 class="sec-title">📊 四维维度分析</h2><div id="dims"></div></div>
+    <div class="res-section"><h2 class="sec-title">📖 深度情商解读</h2><div id="analysis"></div></div>
+    <div class="res-section"><h2 class="sec-title">🔬 科学理论基础</h2><div id="theories"></div></div>
+    <div class="res-section"><h2 class="sec-title">📈 个性化成长行动计划</h2><div id="actions"></div></div>
+    <div class="quote-box"><p class="quote-t" id="qt-text"></p><p class="quote-a" id="qt-author"></p></div>
+    <button class="btn-restart" onclick="location.reload()">重新测评</button>
+  </div>
+
+</div>
+<script>
+const PASSWORDS = ['EQ888','EQ666','EQ999','EQ123','EQ456','EQ789','EQ101','EQ202','EQ303','EQ404'];
+
+const Qs = [
+  {q:"当你感到强烈愤怒时，通常会：",opts:[{t:"立即爆发，无法克制",s:[1,1,1,1]},{t:"压抑下去，独自承受",s:[2,2,2,2]},{t:"先冷静思考，再决定如何回应",s:[3,3,3,3]},{t:"分析情绪来源，寻找建设性表达方式",s:[4,4,4,4]}]},
+  {q:"看到朋友情绪低落，你的第一反应是：",opts:[{t:"装作没看到，避免尴尬",s:[1,1,1,1]},{t:"等他们主动找你",s:[2,2,2,2]},{t:"主动问候，提供支持",s:[3,3,3,3]},{t:"敏锐感知并给予恰当的情感支持",s:[4,4,4,4]}]},
+  {q:"受到批评时，你的第一反应是：",opts:[{t:"立即反驳，为自己辩解",s:[1,1,1,1]},{t:"感到受伤，默默承受",s:[2,2,2,2]},{t:"认真倾听，思考后再回应",s:[3,3,3,3]},{t:"客观分析，从批评中学习成长",s:[4,4,4,4]}]},
+  {q:"团队出现冲突时，你会：",opts:[{t:"回避，置身事外",s:[1,1,1,1]},{t:"站在自己认识的人一边",s:[2,2,2,2]},{t:"尝试理解双方立场",s:[3,3,3,3]},{t:"积极调解，引导双赢解决方案",s:[4,4,4,4]}]},
+  {q:"对自己情绪的感知能力如何？",opts:[{t:"经常搞不清自己的情绪",s:[1,2,1,1]},{t:"有时能意识到，但原因不清",s:[2,2,2,2]},{t:"大多时候能准确识别",s:[3,3,3,3]},{t:"能精准识别并理解情绪来源",s:[4,4,4,4]}]},
+  {q:"在巨大压力下，你通常会：",opts:[{t:"失眠、暴食或其他极端行为",s:[1,1,1,1]},{t:"不断抱怨，影响周围的人",s:[2,2,2,2]},{t:"找人倾诉，适当释放",s:[3,3,3,3]},{t:"运用有效方法自我调节，保持稳定",s:[4,4,4,4]}]},
+  {q:"识别他人情绪的能力如何？",opts:[{t:"很难察觉别人的情绪变化",s:[1,1,1,1]},{t:"有时能感觉到，但不确定",s:[2,2,2,2]},{t:"大部分时候能看出来",s:[3,3,3,3]},{t:"能从细微信号中敏锐感知他人情绪",s:[4,4,4,4]}]},
+  {q:"犯下错误时，你会：",opts:[{t:"找各种理由推卸责任",s:[1,1,1,1]},{t:"默默承认，不主动面对",s:[2,2,2,2]},{t:"承认错误，并尝试弥补",s:[3,3,3,3]},{t:"真诚道歉，并从错误中汲取教训",s:[4,4,4,4]}]},
+  {q:"在团队合作中，你通常：",opts:[{t:"只专注自己的任务",s:[1,1,1,1]},{t:"别人要求才配合",s:[2,2,2,2]},{t:"主动配合，共同完成",s:[3,3,3,3]},{t:"激发团队潜能，推动共同成长",s:[4,4,4,4]}]},
+  {q:"表达不同意见时，你会：",opts:[{t:"直接说出，不顾对方感受",s:[1,1,1,1]},{t:"保持沉默，回避冲突",s:[2,2,2,2]},{t:"委婉表达，顾及对方感受",s:[3,3,3,3]},{t:"建设性沟通，寻求共识",s:[4,4,4,4]}]},
+  {q:"面对未来的不确定性，你的情绪反应是：",opts:[{t:"过度焦虑或盲目乐观",s:[1,1,1,1]},{t:"随波逐流，消极等待",s:[2,2,2,2]},{t:"有所计划，但偶尔失控",s:[3,3,3,3]},{t:"保持开放乐观，积极应对",s:[4,4,4,4]}]},
+  {q:"当别人向你倾诉烦恼时，你会：",opts:[{t:"心不在焉，想着其他事",s:[1,1,1,1]},{t:"听着，但不知如何回应",s:[2,2,2,2]},{t:"专心倾听，给出建议",s:[3,3,3,3]},{t:"深度共情，给予情感支持",s:[4,4,4,4]}]},
+  {q:"你控制冲动行为的能力如何？",opts:[{t:"经常冲动行事，事后后悔",s:[1,1,1,1]},{t:"时能控制，时常失控",s:[2,2,2,2]},{t:"大部分时候能控制住",s:[3,3,3,3]},{t:"能延迟满足，理性决策",s:[4,4,4,4]}]},
+  {q:"遭遇重大挫折时，你会：",opts:[{t:"自怨自艾，长期低落",s:[1,1,1,1]},{t:"抱怨环境，推卸责任",s:[2,2,2,2]},{t:"短暂沮丧后继续前行",s:[3,3,3,3]},{t:"保持韧性，从失败中学习",s:[4,4,4,4]}]},
+  {q:"建立人际关系对你来说：",opts:[{t:"很困难，很难深交",s:[1,1,1,1]},{t:"有几个朋友，不太主动",s:[2,2,2,2]},{t:"有稳定人脉，正常维系",s:[3,3,3,3]},{t:"善于经营，建立深度人际网络",s:[4,4,4,4]}]},
+  {q:"团队取得成功时，你会：",opts:[{t:"只关注自己的贡献",s:[1,1,1,1]},{t:"内心高兴，但不表达",s:[2,2,2,2]},{t:"与团队分享喜悦",s:[3,3,3,3]},{t:"肯定每位成员，激励大家继续前行",s:[4,4,4,4]}]},
+  {q:"理解不同观点的能力：",opts:[{t:"坚持己见，很难接受不同",s:[1,1,1,1]},{t:"有时能理解，但不认同",s:[2,2,2,2]},{t:"愿意理解，寻找共同点",s:[3,3,3,3]},{t:"尊重差异，整合多元视角",s:[4,4,4,4]}]},
+  {q:"感到快乐时，你会：",opts:[{t:"独享，不想分享",s:[1,1,1,1]},{t:"偶尔分享，表达不多",s:[2,2,2,2]},{t:"与亲近的人分享喜悦",s:[3,3,3,3]},{t:"传递正能量，感染周围的人",s:[4,4,4,4]}]},
+  {q:"在领导或被领导过程中，你擅长：",opts:[{t:"独自工作，不愿配合",s:[1,1,1,1]},{t:"按部就班，完成本职",s:[2,2,2,2]},{t:"有效沟通，协调合作",s:[3,3,3,3]},{t:"激发潜力，共同推动成长",s:[4,4,4,4]}]},
+  {q:"适应突发变化的能力如何？",opts:[{t:"强烈抗拒，很难适应",s:[1,1,1,1]},{t:"勉强接受，需要较长时间",s:[2,2,2,2]},{t:"能够适应，但需要一些准备",s:[3,3,3,3]},{t:"拥抱变化，快速灵活应对",s:[4,4,4,4]}]},
+  {q:"当被人误解时，你会：",opts:[{t:"愤怒，立即强力反驳",s:[1,1,1,1]},{t:"委屈，但不说出来",s:[2,2,2,2]},{t:"耐心解释，争取澄清",s:[3,3,3,3]},{t:"理解对方，用沟通化解误会",s:[4,4,4,4]}]},
+  {q:"判断他人性格特质的准确率：",opts:[{t:"经常出错，很难判断",s:[1,1,1,1]},{t:"偶尔准确，不够稳定",s:[2,2,2,2]},{t:"大部分时候判断准确",s:[3,3,3,3]},{t:"能精准识别他人核心特质",s:[4,4,4,4]}]},
+  {q:"需要拒绝他人时，你会：",opts:[{t:"无法拒绝，什么都答应",s:[1,1,1,1]},{t:"拒绝后长时间愧疚",s:[2,2,2,2]},{t:"礼貌地拒绝",s:[3,3,3,3]},{t:"坚定而友善，既清晰又不伤情感",s:[4,4,4,4]}]},
+  {q:"激励他人的能力如何？",opts:[{t:"不擅长，不知如何开口",s:[1,1,1,1]},{t:"偶尔能激励，缺乏持续性",s:[2,2,2,2]},{t:"能激励，但需要经验积累",s:[3,3,3,3]},{t:"善于激发他人潜能与热情",s:[4,4,4,4]}]},
+  {q:"处理复杂人际关系时，你会：",opts:[{t:"困惑茫然，无从下手",s:[1,1,1,1]},{t:"简单处理，能避则避",s:[2,2,2,2]},{t:"分析关系，找到相对平衡点",s:[3,3,3,3]},{t:"巧妙周旋，化解矛盾",s:[4,4,4,4]}]},
+  {q:"平衡工作与生活的能力如何？",opts:[{t:"工作压倒一切，生活混乱",s:[1,1,1,1]},{t:"有时能平衡，但常常失衡",s:[2,2,2,2]},{t:"大部分时候能做到平衡",s:[3,3,3,3]},{t:"游刃有余，两者都能高质量完成",s:[4,4,4,4]}]},
+  {q:"感到嫉妒时，你会：",opts:[{t:"说人坏话，或冷嘲热讽",s:[1,1,1,1]},{t:"压抑下去，心里不舒服",s:[2,2,2,2]},{t:"反思自己，学习他人优点",s:[3,3,3,3]},{t:"转化为动力，激励自我提升",s:[4,4,4,4]}]},
+  {q:"在谈判或协商中，你通常：",opts:[{t:"不善谈判，经常吃亏",s:[1,1,1,1]},{t:"偶尔成功，效果不稳定",s:[2,2,2,2]},{t:"能达成共识，较为有效",s:[3,3,3,3]},{t:"善于谈判，推动双赢结果",s:[4,4,4,4]}]},
+  {q:"团队士气低落时，你会：",opts:[{t:"抱怨团队，萌生退意",s:[1,1,1,1]},{t:"默默等待，期望好转",s:[2,2,2,2]},{t:"鼓励同事，积极提振",s:[3,3,3,3]},{t:"策划行动，重建团队信心",s:[4,4,4,4]}]},
+  {q:"感知团队整体情绪氛围的能力：",opts:[{t:"不敏感，常常察觉不到变化",s:[1,1,1,1]},{t:"偶尔感知，但不够准确",s:[2,2,2,2]},{t:"大部分时候能感知",s:[3,3,3,3]},{t:"对团队情绪变化有高度敏锐感",s:[4,4,4,4]}]},
+  {q:"面对充满不确定的情境时，你会：",opts:[{t:"陷入焦虑，无法行动",s:[1,1,1,1]},{t:"犹豫拖延，难以决策",s:[2,2,2,2]},{t:"评估风险后谨慎行动",s:[3,3,3,3]},{t:"拥抱不确定性，灵活应变",s:[4,4,4,4]}]},
+  {q:"给予他人反馈的能力如何？",opts:[{t:"不善于，常常得罪人",s:[1,1,1,1]},{t:"能给出，但效果欠佳",s:[2,2,2,2]},{t:"能给出有建设性的反馈",s:[3,3,3,3]},{t:"善于反馈，帮助他人成长",s:[4,4,4,4]}]},
+  {q:"做出重要决策时，你会：",opts:[{t:"凭直觉冲动行事",s:[1,1,1,1]},{t:"反复纠结，难以决断",s:[2,2,2,2]},{t:"理性分析，综合各方因素",s:[3,3,3,3]},{t:"情感与理性平衡，做出明智决策",s:[4,4,4,4]}]},
+  {q:"引导或安抚他人情绪的能力：",opts:[{t:"不知道如何管理别人的情绪",s:[1,1,1,1]},{t:"偶尔能安抚，但不熟练",s:[2,2,2,2]},{t:"能应对大部分情况",s:[3,3,3,3]},{t:"善于引导情绪，恢复和谐氛围",s:[4,4,4,4]}]},
+  {q:"经历失败后，你的情绪恢复速度：",opts:[{t:"长时间无法走出",s:[1,1,1,1]},{t:"需要较长时间",s:[2,2,2,2]},{t:"较快恢复，能继续前行",s:[3,3,3,3]},{t:"迅速恢复，并从失败中获得成长",s:[4,4,4,4]}]},
+  {q:"你对他人的自然影响力如何？",opts:[{t:"缺乏影响力，无人听取",s:[1,1,1,1]},{t:"影响有限，依赖权威",s:[2,2,2,2]},{t:"有一定影响力",s:[3,3,3,3]},{t:"自然影响力强，深刻影响他人决策",s:[4,4,4,4]}]},
+  {q:"面对高强度压力时，你的表现：",opts:[{t:"崩溃，完全无法应对",s:[1,1,1,1]},{t:"勉强应付，效率极低",s:[2,2,2,2]},{t:"能应对，有时需要外部支持",s:[3,3,3,3]},{t:"抗压能力强，从容应对",s:[4,4,4,4]}]},
+  {q:"保持长期专注与自律的能力：",opts:[{t:"很难坚持，总是半途而废",s:[1,1,1,1]},{t:"有时能坚持，但不稳定",s:[2,2,2,2]},{t:"大多数情况下能坚持",s:[3,3,3,3]},{t:"高度自律，持续专注地追求目标",s:[4,4,4,4]}]},
+  {q:"在情绪波动时，你是否仍能保持理性？",opts:[{t:"完全被情绪支配，失去理性",s:[1,1,1,1]},{t:"理性大幅下降，难以思考",s:[2,2,2,2]},{t:"能保持部分理性",s:[3,3,3,3]},{t:"情绪与理性并存，做出平衡判断",s:[4,4,4,4]}]},
+  {q:"对他人的包容程度如何？",opts:[{t:"很难接受与自己不同的人",s:[1,1,1,1]},{t:"勉强接受，但心存抵触",s:[2,2,2,2]},{t:"能理解和接受大多数差异",s:[3,3,3,3]},{t:"真正尊重和欣赏多样性",s:[4,4,4,4]}]},
+  {q:"总体来说，你对自己情商水平的评价：",opts:[{t:"较低，情绪常常失控",s:[1,1,1,1]},{t:"一般，仍有很多待提升",s:[2,2,2,2]},{t:"良好，持续学习中",s:[3,3,3,3]},{t:"较高，能妥善处理大多数情境",s:[4,4,4,4]}]}
+];
+
+let curQ = 0, answers = [], scores = {sa:0, sm:0, so:0, rm:0};
+
+function checkPW() {
+  const v = document.getElementById('pw-input').value.trim();
+  if (PASSWORDS.includes(v)) {
+    show('page-quiz'); renderQ();
+  } else { alert('密码错误，请重试！'); }
+}
+
+function show(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function renderQ() {
+  const q = Qs[curQ];
+  document.getElementById('q-num').textContent = `第 ${curQ+1} 题 / 共 ${Qs.length} 题`;
+  document.getElementById('q-text').textContent = q.q;
+  document.getElementById('prog').style.width = `${(curQ+1)/Qs.length*100}%`;
+  const oc = document.getElementById('opts');
+  oc.innerHTML = '';
+  q.opts.forEach((o,i) => {
+    const d = document.createElement('div');
+    d.className = 'opt' + (answers[curQ]===i ? ' selected' : '');
+    d.textContent = o.t;
+    d.onclick = () => { answers[curQ]=i; document.querySelectorAll('.opt').forEach((el,j)=>el.classList.toggle('selected',j===i)); };
+    oc.appendChild(d);
+  });
+  document.getElementById('btn-prev').style.visibility = curQ===0 ? 'hidden' : 'visible';
+  document.getElementById('btn-next').textContent = curQ===Qs.length-1 ? '查看结果' : '下一题';
+}
+
+function prevQ() { if(curQ>0){curQ--;renderQ();} }
+function nextQ() {
+  if(answers[curQ]===undefined){alert('请选择一个选项！');return;}
+  if(curQ<Qs.length-1){curQ++;renderQ();}
+  else { calcResult(); showResult(); }
+}
+
+function calcResult() {
+  scores={sa:0,sm:0,so:0,rm:0};
+  Qs.forEach((q,i)=>{
+    const s = q.opts[answers[i]].s;
+    scores.sa+=s[0]; scores.sm+=s[1]; scores.so+=s[2]; scores.rm+=s[3];
+  });
+  const max=Qs.length*4;
+  scores.sa=Math.round(scores.sa/max*100);
+  scores.sm=Math.round(scores.sm/max*100);
+  scores.so=Math.round(scores.so/max*100);
+  scores.rm=Math.round(scores.rm/max*100);
+}
+
+function showResult() {
+  show('page-result');
+  const total = Math.round((scores.sa+scores.sm+scores.so+scores.rm)/4);
+  document.getElementById('total-score').textContent = total;
+  renderDims(); renderAnalysis(total); renderTheories(); renderActions(); renderQuote();
+}
+
+function lv(s){return s>=80?'优秀':s>=65?'良好':s>=45?'一般':'待提升';}
+
+function renderDims() {
+  const dims=[
+    {name:'自我认知',score:scores.sa,desc:'自我认知指能准确识别和理解自己的情绪、优势、局限和价值观。高分者清楚情绪的来源，并能理解情绪如何影响自己的思考与决策。'},
+    {name:'自我管理',score:scores.sm,desc:'自我管理指有效控制和调节情绪与行为。高分者在压力下保持冷静，控制冲动，积极适应变化，能在逆境中迅速恢复。'},
+    {name:'社交意识',score:scores.so,desc:'社交意识指准确识别和理解他人的情绪、动机与需求。高分者能敏锐捕捉情绪信号，理解社交情境，展现真诚同理心。'},
+    {name:'关系管理',score:scores.rm,desc:'关系管理指有效维护人际关系并影响他人。高分者善于沟通、激励、化解冲突，并在团队中发挥领导力。'}
+  ];
+  document.getElementById('dims').innerHTML = dims.map(d=>`
+    <div class="dim-item">
+      <div class="dim-row"><span class="dim-name">${d.name}</span><span class="dim-type">${lv(d.score)}</span></div>
+      <div class="dim-score">${d.score} 分</div>
+      <p class="dim-desc">${d.desc}</p>
+      <div class="pb"><div class="pb-fill" style="width:${d.score}%"></div></div>
+    </div>`).join('');
+}
+
+function renderAnalysis(total) {
+  let mods;
+  if(total>=75){mods=[
+    {t:'情商精英：卓越情绪智慧',c:'你的情商水平出众，能精准识别自己与他人的情绪，情绪管理能力卓越。在压力和逆境中，你能保持冷静理性，快速恢复并继续前行。你的同理心让你在人际关系中建立深度信任，成为他人的精神支柱。你不仅理解情绪，更懂得将情绪转化为行动的驱动力。'},
+    {t:'人际魅力：天然领袖气质',c:'你卓越的情商赋予你强大的人际影响力。在社交场合中，你能准确把握他人情绪，用恰当方式回应，让对方感到被真正理解。你擅长激励他人，能够点燃团队热情，化解矛盾，推动合作走向成功。你的存在本身就是团队的凝聚力所在。'},
+    {t:'情绪韧性：从容应对一切',c:'你具备出色的情绪韧性，在面对挫折和不确定时，仍能保持内心的稳定与方向感。你不会在负面情绪中长久沉溺，而是能迅速调整心态，重新出发。这种内在力量不仅支撑你面对人生挑战，更成为你持续成长的底层动力。'},
+    {t:'持续精进：永不止步的成长',c:'高情商者最迷人之处在于保持谦逊与学习心态。你明白情商是终身修炼的功课，持续关注自身情绪模式，不断优化人际互动方式。每一次真实的情感连接都让你进一步成长，你的情绪智慧将随时间越来越深厚。'}
+  ];}else if(total>=55){mods=[
+    {t:'情商良好：稳健的情绪管理',c:'你的情商水平良好，在大多数情境下能够有效识别和管理自己的情绪。面对日常压力你能保持相对稳定，具备一定的同理心，人际交往整体顺畅。你的情商为你的工作和生活提供了坚实支撑，让你在大多数情况下做出明智而恰当的回应。'},
+    {t:'真诚交往：有温度的人际关系',c:'你能与不同的人建立合作关系，懂得倾听，尊重他人。你有一批可以信赖的朋友，在困难时能获得支持。在处理冲突时你能保持理性，寻求合理解决。整体来看，你的人际关系质量较高，为你的人生带来了丰富的情感资源和支持网络。'},
+    {t:'情绪适应：逐步提升的应对能力',c:'你的情绪适应能力正在稳步提升。面对挫折时你可能需要一些时间调整，但最终能恢复平衡。你已经掌握了一些情绪调节方法，虽仍有提升空间，但已经能帮你渡过大多数难关。坚持这种持续成长的心态，你的情绪韧性将越来越强。'},
+    {t:'成长空间：触手可及的突破',c:'你的情商基础扎实，只需在几个关键维度上深化练习，就能实现质的提升。建议你更加关注情绪触发点，练习在压力下保持冷静，同时提升对他人情绪的敏锐度。通过持续的自我观察与刻意练习，你完全有能力将良好的情商提升到卓越。'}
+  ];}else{mods=[
+    {t:'情商发展中：成长正在发生',c:'你的情商正在发展之中，时常被情绪左右，或在理解他人方面感到困惑。这很正常——认识到这一点本身就是改变的开始。情商是可以通过学习和刻意练习不断提升的能力，而你已经踏上了这段旅程。接下来，跟随行动计划系统性地练习，你将看到真实的成长。'},
+    {t:'情绪觉醒：从命名情绪开始',c:'情商的提升从感知和命名情绪开始。当你体验到某种情绪时，练习给它命名："我现在感到焦虑/愤怒/委屈......"。识别情绪是管理情绪的第一步。建议你建立情绪日记，每天记录情绪体验，逐渐形成对自身情绪模式的认知，这将成为你提升情商的重要基础。'},
+    {t:'情绪调节：建立你的工具箱',c:'你需要系统学习情绪调节的方法。目前你可能还没找到最适合自己的调节方式。建议尝试深呼吸法、正念冥想、适度运动等。当强烈情绪袭来时，给自己一个"暂停"——深吸气，不立即反应，等情绪稍微平静后再行动。记住，每一次成功的自我调节都是情商的一次提升。'},
+    {t:'人际起步：从真诚倾听出发',c:'人际交往中，倾听是最基础也最有力的技能。练习全神贯注地听对方说话，不打断，不急于提建议，先理解对方的感受。尝试站在他人角度思考："如果我是他，会有什么感受？"这种思维转换能大幅提升你的社交智慧。每一次真诚的交流都是你情商成长的积累。'}
+  ];}
+  document.getElementById('analysis').innerHTML = mods.map(m=>`<div class="ana-mod"><h3 class="ana-mod-title">${m.t}</h3><p class="ana-mod-text">${m.c}</p></div>`).join('');
+}
+
+function renderTheories() {
+  const ts=[
+    {t:'丹尼尔·戈尔曼情商理论',d:'戈尔曼1995年出版的《情商》将情商定义为识别、理解、管理和运用情绪的能力，分为自我认知、自我管理、社交意识和关系管理四大维度。他的大量研究表明，在预测人生成功与幸福方面，情商比智商更具决定性的影响力，这一理论彻底改变了人们对能力的认知。',s:'Goleman, D. (1995). Emotional Intelligence. Bantam Books.'},
+    {t:'萨洛维与梅耶的情绪智力模型',d:'1990年，萨洛维和梅耶首次提出"情绪智力"概念，将其定义为一种可测量的认知能力，包括感知情绪、用情绪促进思考、理解情绪规律和管理情绪四个分支。他们的研究证明，情绪智力与个人的学业成就、工作表现和人际关系质量密切相关，是人类智力的重要组成部分。',s:'Salovey, P., & Mayer, J. D. (1990). Emotional Intelligence. Imagination, Cognition & Personality.'},
+    {t:'神经科学对情商的支撑',d:'神经科学研究表明，大脑的前额叶皮层与杏仁核之间的连接强度直接影响情绪调节能力。高情商者的这两个脑区有更强的协调机制，能够在情绪激活时快速调用理性分析。更重要的是，这种神经连接可以通过正念训练和刻意练习不断强化，科学验证了情商是可以后天提升的能力。',s:'Davidson, R. J. (2003). Affective style, psychopathology, and resilience. American Psychologist.'}
+  ];
+  document.getElementById('theories').innerHTML = ts.map(t=>`<div class="theory-item"><h3 class="theory-title">${t.t}</h3><p class="theory-desc">${t.d}</p><p class="theory-src">来源：${t.s}</p></div>`).join('');
+}
+
+function renderActions() {
+  const acts=[
+    {t:'建立每日情绪日记',c:'每天睡前用5-10分钟记录当天3个情绪体验：情绪名称、触发情境、身体反应和应对方式。持续21天后，你会发现自己对情绪的感知力和理解力大幅提升。这是提升自我认知最简单有效的方法，也是情商训练的起点。'},
+    {t:'每日10分钟正念冥想',c:'正念冥想能显著增强前额叶皮层对杏仁核的调节能力，直接提升情绪管理水平。每天早晨或睡前冥想10分钟：专注呼吸，觉察浮现的情绪和念头，不评判、不抗拒，只是观察。推荐使用Headspace或Calm等应用入门，4周后你会感到情绪稳定性明显提升。'},
+    {t:'深度倾听练习',c:'每周挑选2-3次对话，刻意练习深度倾听：放下手机，眼神接触，专注理解对方表达的情感而非仅仅内容。听完后用自己的话复述对方的感受："听起来你感到……"这种方式能快速提升你的社交意识，让对方感到被真正理解，同时深化你对人际情绪的感知能力。'},
+    {t:'情绪暂停技术',c:'当你感受到强烈情绪时（愤怒、焦虑、委屈），立即执行"情绪暂停"：深吸气4秒，屏气2秒，缓呼气6秒，重复3次。这个简单动作能激活副交感神经，迅速降低情绪强度，让理性重新回到主导位置。在每一次情绪触发时刻意练习，三周内你会形成新的情绪反应模式。'},
+    {t:'主动同理心训练',c:'每天选择1-2个情境，刻意练习同理心：当看到他人表现时，先问自己"他/她现在感受到的是什么？什么经历让他/她做出这种反应？"从理解而非评判的角度看待他人行为。同时阅读优质小说或观看深度影视作品，有意识地代入不同角色的情感世界，这是训练同理心最有趣也最有效的方法之一。'}
+  ];
+  document.getElementById('actions').innerHTML = acts.map((a,i)=>`<div class="action-item"><h3 class="action-title"><span class="action-num">${i+1}</span>${a.t}</h3><p class="action-text">${a.c}</p></div>`).join('');
+}
+
+function renderQuote() {
+  const qs=[
+    {t:'"情绪智慧不是没有情绪，而是情绪为你服务，而不是主宰你。"',a:'丹尼尔·戈尔曼'},
+    {t:'"了解他人是智慧，了解自己是真正的启迪。"',a:'老子'},
+    {t:'"在所有人类成就中，最伟大的是能够掌控自己情绪的人。"',a:'拿破仑·希尔'},
+    {t:'"共情不是一种奢侈，它是人类文明最基本的道德纽带。"',a:'杰里米·里夫金'}
+  ];
+  const q=qs[Math.floor(Math.random()*qs.length)];
+  document.getElementById('qt-text').textContent=q.t;
+  document.getElementById('qt-author').textContent=`—— ${q.a}`;
+}
+
+// 粒子背景
+function initParticles() {
+  const canvas = document.getElementById('particles-canvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  if (!ctx) return;
+  function resize() { canvas.width=window.innerWidth; canvas.height=window.innerHeight; }
+  resize();
+  const particles = Array.from({length:80},()=>({
+    x:Math.random()*canvas.width, y:Math.random()*canvas.height,
+    vx:(Math.random()-.5)*.5, vy:(Math.random()-.5)*.5,
+    r:Math.random()*2.5+.8,
+    c:['#f472b6','#ec4899','#fb7185'][Math.floor(Math.random()*3)],
+    a:Math.random()*.5+.3
+  }));
+  function draw() {
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    particles.forEach((p,i)=>{
+      p.x+=p.vx; p.y+=p.vy;
+      if(p.x<0||p.x>canvas.width)p.vx*=-1;
+      if(p.y<0||p.y>canvas.height)p.vy*=-1;
+      ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+      ctx.fillStyle=p.c; ctx.globalAlpha=p.a; ctx.fill(); ctx.globalAlpha=1;
+      for(let j=i+1;j<particles.length;j++){
+        const q=particles[j], dx=p.x-q.x, dy=p.y-q.y, dist=Math.sqrt(dx*dx+dy*dy);
+        if(dist<140){ctx.beginPath();ctx.moveTo(p.x,p.y);ctx.lineTo(q.x,q.y);ctx.strokeStyle=p.c;ctx.lineWidth=.5;ctx.globalAlpha=(140-dist)/140*.25;ctx.stroke();ctx.globalAlpha=1;}
+      }
+    });
+    requestAnimationFrame(draw);
+  }
+  draw();
+  window.addEventListener('resize',resize);
+}
+
+document.addEventListener('DOMContentLoaded', initParticles);
+document.getElementById('pw-input').addEventListener('keypress', e=>{if(e.key==='Enter')checkPW();});
+</script>
+</body>
+</html>

@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>人生机遇敏感度测评</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{font-family:'Noto Sans SC',sans-serif;background:#0a0a14;color:#fff;min-height:100vh;overflow-x:hidden}
+        #particles-canvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none}
+        .container{position:relative;z-index:1;max-width:900px;margin:0 auto;padding:40px 20px}
+        .page{display:none;animation:fadeIn .5s ease}.page.active{display:block}
+        @keyframes fadeIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+        .home-wrap{text-align:center;padding-top:60px}
+        .top-badge{display:inline-block;background:linear-gradient(135deg,#fbbf24,#f59e0b);padding:8px 24px;border-radius:30px;font-size:.95rem;font-weight:600;margin-bottom:30px;box-shadow:0 4px 15px rgba(251,191,36,.35);color:#1a1a2e}
+        .main-title{font-family:'Noto Serif SC',serif;font-size:3.5rem;background:linear-gradient(135deg,#fde68a,#fbbf24,#f59e0b);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;filter:drop-shadow(0 0 25px rgba(251,191,36,.4));line-height:1.2;margin-bottom:16px}
+        .sub-title{font-size:1.25rem;color:#ccc;margin-bottom:12px}
+        .description{font-size:1rem;color:#999;line-height:1.8;max-width:680px;margin:0 auto 28px}
+        .feature-tags{display:flex;justify-content:center;gap:16px;flex-wrap:wrap;margin-bottom:40px}
+        .ftag{background:rgba(251,191,36,.1);border:1px solid rgba(251,191,36,.3);padding:8px 20px;border-radius:20px;font-size:.9rem;color:#fbbf24}
+        .pw-box{max-width:460px;margin:0 auto 50px;background:rgba(20,20,30,.7);backdrop-filter:blur(10px);border:2px solid rgba(251,191,36,.35);border-radius:20px;padding:45px;box-shadow:0 0 60px rgba(251,191,36,.2)}
+        .pw-label{text-align:center;color:#fbbf24;font-size:1.05rem;margin-bottom:16px;display:block}
+        .pw-input{width:100%;padding:16px;font-size:1.2rem;background:rgba(10,10,20,.9);border:2px solid #333;border-radius:12px;color:#fbbf24;text-align:center;margin-bottom:22px;transition:all .3s}
+        .pw-input:focus{outline:none;border-color:#fbbf24;box-shadow:0 0 20px rgba(251,191,36,.3)}
+        .pw-input::placeholder{color:rgba(251,191,36,.3)}
+        .btn-start{width:100%;padding:16px;font-size:1.1rem;font-weight:700;border:none;border-radius:12px;cursor:pointer;background:linear-gradient(135deg,#fbbf24,#f59e0b);color:#1a1a2e;letter-spacing:2px;transition:all .3s;box-shadow:0 6px 20px rgba(251,191,36,.4)}
+        .btn-start:hover{transform:translateY(-3px);box-shadow:0 10px 30px rgba(251,191,36,.55)}
+        .fc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:20px;padding:0 10px}
+        .fc-card{background:rgba(20,20,30,.6);backdrop-filter:blur(8px);border:1px solid rgba(251,191,36,.2);border-radius:16px;padding:28px 22px;text-align:center;transition:all .3s}
+        .fc-card:hover{transform:translateY(-5px);border-color:rgba(251,191,36,.5);box-shadow:0 10px 30px rgba(251,191,36,.18)}
+        .fc-icon{font-size:2.5rem;margin-bottom:14px}
+        .fc-title{font-size:1.1rem;font-weight:600;color:#fbbf24;margin-bottom:8px}
+        .fc-desc{font-size:.9rem;color:#999;line-height:1.6}
+        h1.qt{font-family:'Noto Serif SC',serif;font-size:2rem;color:#fbbf24;text-align:center;margin-bottom:8px;text-shadow:0 0 25px rgba(251,191,36,.4)}
+        .qt-sub{text-align:center;color:#999;margin-bottom:25px}
+        .prog-bar{height:8px;background:rgba(255,255,255,.1);border-radius:10px;margin-bottom:28px;overflow:hidden}
+        .prog-fill{height:100%;background:linear-gradient(90deg,#fbbf24,#f59e0b);border-radius:10px;transition:width .5s}
+        .q-card{background:rgba(20,20,30,.8);border:2px solid rgba(251,191,36,.3);border-radius:20px;padding:38px;margin-bottom:24px}
+        .q-num{display:inline-block;background:linear-gradient(135deg,#fbbf24,#f59e0b);padding:5px 16px;border-radius:15px;font-size:.85rem;margin-bottom:18px;color:#1a1a2e;font-weight:700}
+        .q-text{font-size:1.35rem;line-height:1.8;color:#fff;margin-bottom:28px}
+        .options{display:grid;gap:14px}
+        .opt{background:rgba(255,255,255,.04);border:2px solid rgba(251,191,36,.2);border-radius:12px;padding:18px 22px;cursor:pointer;font-size:1.05rem;transition:all .3s}
+        .opt:hover{background:rgba(251,191,36,.1);border-color:#fbbf24;transform:translateX(5px)}
+        .opt.selected{background:rgba(251,191,36,.15);border-color:#fbbf24;box-shadow:0 0 18px rgba(251,191,36,.25)}
+        .nav-btns{display:flex;gap:14px;margin-top:22px}
+        .btn-nav{flex:1;padding:14px;font-size:1rem;background:rgba(251,191,36,.1);border:2px solid #fbbf24;color:#fbbf24;border-radius:10px;cursor:pointer;font-weight:600;transition:all .3s}
+        .btn-nav:hover{background:#fbbf24;color:#1a1a2e}
+        .res-header{text-align:center;padding:30px;background:rgba(20,20,30,.8);border:2px solid rgba(251,191,36,.3);border-radius:20px;margin-bottom:28px}
+        .res-title{font-family:'Noto Serif SC',serif;font-size:2.5rem;color:#fbbf24;margin-bottom:8px}
+        .res-sub{font-size:1.1rem;color:#999;margin-bottom:18px}
+        .score-big{font-size:3.5rem;font-weight:700;color:#fbbf24;text-shadow:0 0 30px rgba(251,191,36,.5)}
+        .score-lbl{color:#aaa;font-size:1rem;margin-top:6px}
+        .res-section{background:rgba(20,20,30,.8);border:2px solid rgba(251,191,36,.3);border-radius:20px;padding:35px;margin-bottom:26px}
+        .sec-title{font-family:'Noto Serif SC',serif;font-size:1.7rem;color:#fbbf24;margin-bottom:22px;display:flex;align-items:center;gap:10px}
+        .dim-item{background:rgba(255,255,255,.03);padding:20px;border-radius:14px;border-left:4px solid #fbbf24;margin-bottom:18px}
+        .dim-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+        .dim-name{font-size:1.1rem;font-weight:600}
+        .dim-type{font-size:1rem;color:#fbbf24;font-weight:600}
+        .dim-score{font-size:1.8rem;font-weight:700;color:#fbbf24;margin:6px 0}
+        .dim-desc{color:#b0b0b0;font-size:.95rem;line-height:1.7;margin-bottom:12px}
+        .pb{height:9px;background:rgba(255,255,255,.08);border-radius:8px;overflow:hidden}
+        .pb-fill{height:100%;background:linear-gradient(90deg,#fbbf24,#f59e0b);border-radius:8px;transition:width .6s}
+        .ana-mod{background:rgba(255,255,255,.02);padding:24px;border-radius:14px;border:1px solid rgba(251,191,36,.18);margin-bottom:16px}
+        .ana-mod-title{font-size:1.2rem;color:#fbbf24;font-weight:600;margin-bottom:12px}
+        .ana-mod-text{color:#c0c0c0;font-size:.97rem;line-height:1.85}
+        .theory-item{padding:22px;border-radius:14px;border-left:4px solid #fbbf24;background:rgba(255,255,255,.02);margin-bottom:16px}
+        .theory-title{font-size:1.1rem;color:#fbbf24;font-weight:600;margin-bottom:10px}
+        .theory-desc{color:#b0b0b0;font-size:.95rem;line-height:1.7}
+        .theory-src{color:#fbbf24;font-size:.85rem;margin-top:8px;font-style:italic}
+        .action-item{background:rgba(255,255,255,.03);padding:24px;border-radius:14px;border:1px solid rgba(251,191,36,.18);margin-bottom:16px;transition:all .3s}
+        .action-item:hover{transform:translateY(-3px);border-color:rgba(251,191,36,.4);box-shadow:0 8px 25px rgba(251,191,36,.15)}
+        .action-title{font-size:1.15rem;color:#fbbf24;font-weight:600;margin-bottom:10px;display:flex;align-items:center;gap:10px}
+        .action-num{background:linear-gradient(135deg,#fbbf24,#f59e0b);width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.85rem;font-weight:700;flex-shrink:0;color:#1a1a2e}
+        .action-text{color:#b0b0b0;font-size:.95rem;line-height:1.75}
+        .quote-box{text-align:center;padding:38px;background:rgba(251,191,36,.05);border:2px solid rgba(251,191,36,.22);border-radius:18px;margin-top:26px}
+        .quote-t{font-family:'Noto Serif SC',serif;font-size:1.45rem;color:#fff;line-height:1.8;margin-bottom:18px;font-style:italic}
+        .quote-a{color:#fbbf24;font-size:1.05rem}
+        .btn-restart{width:100%;padding:16px;font-size:1.05rem;font-weight:700;border:none;border-radius:12px;cursor:pointer;background:linear-gradient(135deg,#fbbf24,#f59e0b);color:#1a1a2e;letter-spacing:2px;transition:all .3s;margin-top:28px}
+        .btn-restart:hover{transform:translateY(-3px)}
+        @media(max-width:768px){.main-title{font-size:2.4rem}.pw-box{padding:28px 20px}.fc-grid{grid-template-columns:1fr}.q-card{padding:26px 20px}.q-text{font-size:1.15rem}.nav-btns{flex-direction:column}.res-section{padding:24px 18px}}
+    </style>
+</head>
+<body>
+<canvas id="particles-canvas"></canvas>
+<div class="container">
+  <div class="page active" id="page-pw">
+    <div class="home-wrap">
+      <div class="top-badge">⚡ 专业人生机遇敏感度测评</div>
+      <h1 class="main-title">人生机遇敏感度测评</h1>
+      <p class="sub-title">发现你的机遇感知力，开启人生新可能</p>
+      <p class="description">机遇从不偏爱偶然，它青睐有准备的人。本测评基于心理学、神经科学与成功学研究，全面评估你的机遇感知力、行动力、人脉经营力和风险承担力，帮助你了解自己捕捉和创造人生机遇的能力。</p>
+      <div class="feature-tags">
+        <span class="ftag">📊 40道专业题目</span>
+        <span class="ftag">⏱️ 约12分钟</span>
+        <span class="ftag">🚀 战略成长分析</span>
+      </div>
+      <div class="pw-box">
+        <label class="pw-label">测评密码</label>
+        <input class="pw-input" type="password" id="pw-input" placeholder="请输入测评密码">
+        <button class="btn-start" onclick="checkPW()">开始测评</button>
+      </div>
+      <div class="fc-grid">
+        <div class="fc-card"><div class="fc-icon">👁️</div><h3 class="fc-title">机遇感知</h3><p class="fc-desc">评估你识别和捕捉机遇信号的敏锐度</p></div>
+        <div class="fc-card"><div class="fc-icon">⚡</div><h3 class="fc-title">行动执行</h3><p class="fc-desc">衡量你将机遇转化为行动的执行力</p></div>
+        <div class="fc-card"><div class="fc-icon">🌐</div><h3 class="fc-title">资源整合</h3><p class="fc-desc">了解你构建和运用资源网络的能力</p></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="page" id="page-quiz">
+    <h1 class="qt">人生机遇敏感度测评</h1>
+    <p class="qt-sub">请根据你的真实行为和思维习惯作答</p>
+    <div class="prog-bar"><div class="prog-fill" id="prog"></div></div>
+    <div class="q-card">
+      <span class="q-num" id="q-num">第 1 题 / 共 40 题</span>
+      <p class="q-text" id="q-text"></p>
+      <div class="options" id="opts"></div>
+    </div>
+    <div class="nav-btns">
+      <button class="btn-nav" id="btn-prev" onclick="prevQ()">上一题</button>
+      <button class="btn-nav" id="btn-next" onclick="nextQ()">下一题</button>
+    </div>
+  </div>
+
+  <div class="page" id="page-result">
+    <div class="res-header">
+      <h1 class="res-title">机遇敏感度报告</h1>
+      <p class="res-sub">基于40道专业题目的深度分析</p>
+      <div class="score-big" id="total-score">—</div>
+      <p class="score-lbl">机遇敏感度指数 / 100</p>
+    </div>
+    <div class="res-section"><h2 class="sec-title">📊 四维能力分析</h2><div id="dims"></div></div>
+    <div class="res-section"><h2 class="sec-title">📖 深度机遇解读</h2><div id="analysis"></div></div>
+    <div class="res-section"><h2 class="sec-title">🔬 科学理论基础</h2><div id="theories"></div></div>
+    <div class="res-section"><h2 class="sec-title">📈 个性化机遇行动计划</h2><div id="actions"></div></div>
+    <div class="quote-box"><p class="quote-t" id="qt-text"></p><p class="quote-a" id="qt-author"></p></div>
+    <button class="btn-restart" onclick="location.reload()">重新测评</button>
+  </div>
+</div>
+<script>
+const PASSWORDS=['OPP888','OPP666','OPP999','OPP123','OPP456','OPP789','OPP101','OPP202','OPP303','OPP404'];
+const Qs=[
+  {q:"当遇到陌生领域的信息时，你会：",opts:[{t:"忽略，觉得与我无关",s:[1,1,1,1]},{t:"随便看看就算了",s:[2,2,2,2]},{t:"认真了解，保留信息",s:[3,3,3,3]},{t:"深入研究，主动建立连接",s:[4,4,4,4]}]},
+  {q:"你是否善于发现行业趋势和变化信号？",opts:[{t:"完全不关注趋势",s:[1,1,1,1]},{t:"偶尔关注，但不系统",s:[2,2,2,2]},{t:"持续关注主要趋势",s:[3,3,3,3]},{t:"能预判趋势，提前布局",s:[4,4,4,4]}]},
+  {q:"面对不确定的机会，你的行动倾向：",opts:[{t:"等到完全确定再行动",s:[1,1,1,1]},{t:"犹豫很久，往往错过",s:[2,2,2,2]},{t:"评估后果断行动",s:[3,3,3,3]},{t:"快速决策，边做边调整",s:[4,4,4,4]}]},
+  {q:"你维护人脉关系的方式：",opts:[{t:"从不主动维护",s:[1,1,1,1]},{t:"有需要时才联系",s:[2,2,2,2]},{t:"定期保持联系",s:[3,3,3,3]},{t:"主动经营，建立深度网络",s:[4,4,4,4]}]},
+  {q:"你是否愿意接受风险和不确定性？",opts:[{t:"极度回避，追求绝对安全",s:[1,1,1,1]},{t:"风险让我焦虑，尽量回避",s:[2,2,2,2]},{t:"能接受合理风险",s:[3,3,3,3]},{t:"视风险为机遇，善于管理风险",s:[4,4,4,4]}]},
+  {q:"面对新机会，你评估速度如何？",opts:[{t:"很慢，需要大量时间",s:[1,1,1,1]},{t:"一般，但有时太晚",s:[2,2,2,2]},{t:"较快，能及时决策",s:[3,3,3,3]},{t:"迅速评估关键要素，快速判断",s:[4,4,4,4]}]},
+  {q:"你是否会主动创造机遇，而非等待？",opts:[{t:"从不，只能被动等待",s:[1,1,1,1]},{t:"偶尔，但不系统",s:[2,2,2,2]},{t:"会主动寻找机会",s:[3,3,3,3]},{t:"系统性地创造和拓展机遇",s:[4,4,4,4]}]},
+  {q:"你是否善于从失败中提取价值？",opts:[{t:"失败让我长期沮丧",s:[1,1,1,1]},{t:"很难提取，感到白费",s:[2,2,2,2]},{t:"能从失败中学习",s:[3,3,3,3]},{t:"把失败视为最宝贵的学习资产",s:[4,4,4,4]}]},
+  {q:"你是否持续学习和更新知识？",opts:[{t:"很少学习，固守已知",s:[1,1,1,1]},{t:"偶尔学习",s:[2,2,2,2]},{t:"有一定学习习惯",s:[3,3,3,3]},{t:"系统持续学习，保持知识前沿",s:[4,4,4,4]}]},
+  {q:"在社交场合，你是否善于发现合作机会？",opts:[{t:"从不想到合作",s:[1,1,1,1]},{t:"偶尔想到，但不行动",s:[2,2,2,2]},{t:"能识别并探索合作",s:[3,3,3,3]},{t:"敏锐感知协同机会，主动推进",s:[4,4,4,4]}]},
+  {q:"你是否善于把握时机（timing）？",opts:[{t:"经常错过最佳时机",s:[1,1,1,1]},{t:"有时能把握，有时错过",s:[2,2,2,2]},{t:"大部分时候把握得当",s:[3,3,3,3]},{t:"对时机高度敏感，精准把握",s:[4,4,4,4]}]},
+  {q:"面对挑战，你的第一反应是：",opts:[{t:"想着如何逃避",s:[1,1,1,1]},{t:"担忧，不知如何是好",s:[2,2,2,2]},{t:"分析挑战，寻找出路",s:[3,3,3,3]},{t:"把挑战看作成长的机遇",s:[4,4,4,4]}]},
+  {q:"你的目标设定方式：",opts:[{t:"没有明确目标",s:[1,1,1,1]},{t:"有模糊的目标",s:[2,2,2,2]},{t:"有清晰的目标和计划",s:[3,3,3,3]},{t:"SMART目标+执行系统+定期复盘",s:[4,4,4,4]}]},
+  {q:"你是否善于借助他人的力量？",opts:[{t:"坚持独自完成，不善借力",s:[1,1,1,1]},{t:"偶尔借助，但不主动",s:[2,2,2,2]},{t:"能有效借助他人资源",s:[3,3,3,3]},{t:"擅长杠杆借力，构建协同效应",s:[4,4,4,4]}]},
+  {q:"你的好奇心程度如何？",opts:[{t:"对新事物缺乏好奇",s:[1,1,1,1]},{t:"偶尔好奇",s:[2,2,2,2]},{t:"对很多事物保持好奇",s:[3,3,3,3]},{t:"旺盛的好奇心，热爱探索未知",s:[4,4,4,4]}]},
+  {q:"你是否有清晰的个人品牌或专业定位？",opts:[{t:"完全没有",s:[1,1,1,1]},{t:"模糊，说不清自己的定位",s:[2,2,2,2]},{t:"有一定定位",s:[3,3,3,3]},{t:"清晰的个人品牌，主动传播影响力",s:[4,4,4,4]}]},
+  {q:"你是否习惯性地跨出舒适区？",opts:[{t:"极少，舒适区是我的全部",s:[1,1,1,1]},{t:"被迫时才会",s:[2,2,2,2]},{t:"会主动尝试新事物",s:[3,3,3,3]},{t:"不断主动扩展舒适区边界",s:[4,4,4,4]}]},
+  {q:"面对信息过载，你如何筛选机遇信号？",opts:[{t:"无法筛选，感到混乱",s:[1,1,1,1]},{t:"随机处理，效率不高",s:[2,2,2,2]},{t:"能筛选关键信息",s:[3,3,3,3]},{t:"有系统的信息过滤框架",s:[4,4,4,4]}]},
+  {q:"你是否善于在看似不相关的事物中发现联系？",opts:[{t:"很难，思维比较线性",s:[1,1,1,1]},{t:"偶尔能发现",s:[2,2,2,2]},{t:"经常能找到有趣连接",s:[3,3,3,3]},{t:"天然的跨界思维，善于跨域整合",s:[4,4,4,4]}]},
+  {q:"你的执行力和跟进能力：",opts:[{t:"好主意很多，执行极差",s:[1,1,1,1]},{t:"开始容易，坚持难",s:[2,2,2,2]},{t:"能完成大部分任务",s:[3,3,3,3]},{t:"强大执行力，跟进到位",s:[4,4,4,4]}]},
+  {q:"你是否主动向成功的人学习？",opts:[{t:"从不，觉得不需要",s:[1,1,1,1]},{t:"偶尔，但不系统",s:[2,2,2,2]},{t:"会向前辈和导师学习",s:[3,3,3,3]},{t:"建立导师网络，系统学习",s:[4,4,4,4]}]},
+  {q:"遇到不熟悉的领域，你会：",opts:[{t:"彻底回避",s:[1,1,1,1]},{t:"浅尝即止",s:[2,2,2,2]},{t:"主动了解，拓展认知",s:[3,3,3,3]},{t:"深度探索，寻找跨界机遇",s:[4,4,4,4]}]},
+  {q:"你是否有持续积累的习惯（知识、关系、技能）？",opts:[{t:"没有，活在当下",s:[1,1,1,1]},{t:"偶尔积累，但不持续",s:[2,2,2,2]},{t:"有一定积累习惯",s:[3,3,3,3]},{t:"系统积累，复利效应显著",s:[4,4,4,4]}]},
+  {q:"你是否具备快速原型和测试的能力？",opts:[{t:"很难，必须完美才开始",s:[1,1,1,1]},{t:"过于谨慎，执行慢",s:[2,2,2,2]},{t:"能较快推出初步方案",s:[3,3,3,3]},{t:"快速迭代，边试边优化",s:[4,4,4,4]}]},
+  {q:"你的财务认知和资本运用能力：",opts:[{t:"财务意识薄弱",s:[1,1,1,1]},{t:"基本财务意识",s:[2,2,2,2]},{t:"有一定的财务规划能力",s:[3,3,3,3]},{t:"善于运用资本杠杆创造机遇",s:[4,4,4,4]}]},
+  {q:"面对大的机会但自身资源不足，你会：",opts:[{t:"放弃，等条件成熟",s:[1,1,1,1]},{t:"遗憾，但无能为力",s:[2,2,2,2]},{t:"想办法克服资源限制",s:[3,3,3,3]},{t:"创造性地整合外部资源推进",s:[4,4,4,4]}]},
+  {q:"你在社交媒体或公开场合的影响力：",opts:[{t:"完全没有影响力",s:[1,1,1,1]},{t:"影响力有限",s:[2,2,2,2]},{t:"有一定的影响力",s:[3,3,3,3]},{t:"持续建立影响力，机遇自然涌现",s:[4,4,4,4]}]},
+  {q:"你是否善于进行长期思考和战略布局？",opts:[{t:"只关注眼前，不思考未来",s:[1,1,1,1]},{t:"短期思维为主",s:[2,2,2,2]},{t:"有一定的长期规划",s:[3,3,3,3]},{t:"战略视野宽广，10年维度思考",s:[4,4,4,4]}]},
+  {q:"在重要机会面前，你是否善于说服他人支持你？",opts:[{t:"不善于，总是独自努力",s:[1,1,1,1]},{t:"偶尔能说服，但不稳定",s:[2,2,2,2]},{t:"能有效说服关键人物",s:[3,3,3,3]},{t:"卓越的影响力，能凝聚各方支持",s:[4,4,4,4]}]},
+  {q:"你是否定期复盘和调整方向？",opts:[{t:"从不复盘",s:[1,1,1,1]},{t:"偶尔，但不系统",s:[2,2,2,2]},{t:"定期进行复盘",s:[3,3,3,3]},{t:"系统复盘，持续迭代优化",s:[4,4,4,4]}]},
+  {q:"你是否善于在变局中发现新机遇？",opts:[{t:"变化让我只感到威胁",s:[1,1,1,1]},{t:"主要感到压力",s:[2,2,2,2]},{t:"能在变化中找到部分机遇",s:[3,3,3,3]},{t:"变局是最大机遇，率先卡位",s:[4,4,4,4]}]},
+  {q:"你是否善于运用自己的独特优势？",opts:[{t:"不了解自己的优势",s:[1,1,1,1]},{t:"了解但没有充分发挥",s:[2,2,2,2]},{t:"能运用主要优势",s:[3,3,3,3]},{t:"精准定位差异化优势，持续放大",s:[4,4,4,4]}]},
+  {q:"你的耐心和长期坚持能力：",opts:[{t:"很难坚持，频繁放弃",s:[1,1,1,1]},{t:"坚持有限，容易动摇",s:[2,2,2,2]},{t:"能坚持重要目标",s:[3,3,3,3]},{t:"超强耐心，长期主义者",s:[4,4,4,4]}]},
+  {q:"你是否善于给自己制造幸运？",opts:[{t:"觉得运气完全靠天",s:[1,1,1,1]},{t:"相信努力，但不主动创造",s:[2,2,2,2]},{t:"能一定程度上影响机遇",s:[3,3,3,3]},{t:"理解运气=准备+行动+人脉+心态",s:[4,4,4,4]}]},
+  {q:"总体来说，你的人生机遇敏感度：",opts:[{t:"很低，常感觉别人的机遇与我无关",s:[1,1,1,1]},{t:"一般，偶尔能抓住机遇",s:[2,2,2,2]},{t:"良好，经常发现和把握机遇",s:[3,3,3,3]},{t:"极高，机遇自然向我涌来",s:[4,4,4,4]}]}
+];
+
+let curQ=0,answers=[],scores={perceive:0,action:0,network:0,risk:0};
+function checkPW(){const v=document.getElementById('pw-input').value.trim();if(PASSWORDS.includes(v)){show('page-quiz');renderQ();}else alert('密码错误，请重试！');}
+function show(id){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.getElementById(id).classList.add('active');}
+function renderQ(){
+  const q=Qs[curQ];
+  document.getElementById('q-num').textContent=`第 ${curQ+1} 题 / 共 ${Qs.length} 题`;
+  document.getElementById('q-text').textContent=q.q;
+  document.getElementById('prog').style.width=`${(curQ+1)/Qs.length*100}%`;
+  const oc=document.getElementById('opts');oc.innerHTML='';
+  q.opts.forEach((o,i)=>{
+    const d=document.createElement('div');
+    d.className='opt'+(answers[curQ]===i?' selected':'');
+    d.textContent=o.t;
+    d.onclick=()=>{answers[curQ]=i;document.querySelectorAll('.opt').forEach((el,j)=>el.classList.toggle('selected',j===i));};
+    oc.appendChild(d);
+  });
+  document.getElementById('btn-prev').style.visibility=curQ===0?'hidden':'visible';
+  document.getElementById('btn-next').textContent=curQ===Qs.length-1?'查看结果':'下一题';
+}
+function prevQ(){if(curQ>0){curQ--;renderQ();}}
+function nextQ(){
+  if(answers[curQ]===undefined){alert('请选择一个选项！');return;}
+  if(curQ<Qs.length-1){curQ++;renderQ();}
+  else{calcResult();showResult();}
+}
+function calcResult(){
+  scores={perceive:0,action:0,network:0,risk:0};
+  Qs.forEach((q,i)=>{const s=q.opts[answers[i]].s;scores.perceive+=s[0];scores.action+=s[1];scores.network+=s[2];scores.risk+=s[3];});
+  const max=Qs.length*4;
+  scores.perceive=Math.round(scores.perceive/max*100);scores.action=Math.round(scores.action/max*100);
+  scores.network=Math.round(scores.network/max*100);scores.risk=Math.round(scores.risk/max*100);
+}
+function showResult(){
+  show('page-result');
+  const total=Math.round((scores.perceive+scores.action+scores.network+scores.risk)/4);
+  document.getElementById('total-score').textContent=total;
+  renderDims();renderAnalysis(total);renderTheories();renderActions();renderQuote();
+}
+function lv(s){return s>=80?'卓越':s>=65?'优秀':s>=45?'良好':'待提升';}
+function renderDims(){
+  const dims=[
+    {name:'机遇感知力',score:scores.perceive,desc:'机遇感知力是识别潜在机会的能力，包括对趋势的敏锐嗅觉、跨领域联结思维和信号解读能力。高分者能在他人视而不见处看到机遇，善于从混沌信息中提取价值信号。'},
+    {name:'行动执行力',score:scores.action,desc:'行动执行力是将机遇转化为现实的能力，包括快速决策、持续执行和迭代优化。高分者不等待完美条件，而是快速启动、边做边调整，把握先发优势。'},
+    {name:'人脉资源力',score:scores.network,desc:'人脉资源力包括建立和运用人际网络，以及整合外部资源的能力。高分者深知价值来自于连接，主动经营多元化的人脉网络，善于借力和创造协同效应。'},
+    {name:'风险承担力',score:scores.risk,desc:'风险承担力是在不确定中前行的勇气和能力，包括风险评估、承受损失和从失败中恢复。高分者不回避风险，而是主动管理风险，视不确定性为竞争优势。'}
+  ];
+  document.getElementById('dims').innerHTML=dims.map(d=>`
+    <div class="dim-item">
+      <div class="dim-row"><span class="dim-name">${d.name}</span><span class="dim-type">${lv(d.score)}</span></div>
+      <div class="dim-score">${d.score} 分</div>
+      <p class="dim-desc">${d.desc}</p>
+      <div class="pb"><div class="pb-fill" style="width:${d.score}%"></div></div>
+    </div>`).join('');
+}
+function renderAnalysis(total){
+  let mods;
+  if(total>=75){mods=[
+    {t:'机遇猎手：天赋异禀的机遇感知者',c:'你拥有罕见的机遇感知天赋，能在别人尚未意识到的地方看到潜在的金矿。你的思维高度活跃，善于建立跨领域连接，能从纷繁的信息中迅速提取有价值的信号。你不仅能感知机遇，还具备将其转化为现实的行动力。这种组合让你在人生的关键节点上往往能做出前瞻性的决策，走在时代曲线的前面。'},
+    {t:'行动哲学：速度即优势',c:'你深刻理解速度在现代竞争中的价值。你不等待完美条件，而是快速启动，在行动中收集反馈，持续迭代。这种"精益"的行动哲学让你能够以最小的资源成本探索最大的可能性。你的执行力不仅体现在速度上，更体现在跟进的彻底性和面对挫折时的韧性。你知道，能够执行的平庸计划远胜于永远停留在脑中的完美方案。'},
+    {t:'资源整合：一个人等于一支团队',c:'你拥有卓越的资源整合能力，深知一个人的力量是有限的，但网络的力量是无限的。你不局限于自身拥有的资源，而是善于激活和整合周围人的知识、网络、资本和能力。你的人脉网络不是名片夹，而是真实的价值创造网络。你帮助他人，也让他人愿意帮助你，形成强大的正向循环。'},
+    {t:'长期主义：在正确的事上持续积累',c:'你具备长期主义者的核心特质：愿意在今天做出牺牲，换取未来更大的回报。你的积累是系统性的——持续扩展知识边界，深化核心竞争力，经营长期关系。这种复利效应在短期内可能不显眼，但时间越长，优势越难以被赶上。你是在为10年后的自己投资，而大多数人只看明天。'}
+  ];}else if(total>=55){mods=[
+    {t:'机遇觉醒者：潜力等待释放',c:'你已经具备了相当的机遇意识，能够在日常生活中识别和把握一些机会。你的机遇敏感度处于良好水平，通过系统训练和刻意练习，你完全有潜力成为一名卓越的机遇猎手。关键是建立更系统的机遇感知框架，并提升行动的速度和一致性。'},
+    {t:'行动突破口：从思考到行动',c:'你可能在思考和分析上投入较多，但在行动速度上还有提升空间。过度分析往往是成功的最大障碍之一。建议你设立一个"最小可行行动"原则：对任何机遇，在48小时内采取一个具体的小行动。这种快速启动的习惯，将从根本上改变你与机遇的关系。'},
+    {t:'人脉深耕：从数量到质量',c:'你已经建立了一定的人脉网络，但可以进一步提升连接的深度和策略性。真正有价值的人脉不在于数量，而在于互信的深度和价值交换的质量。建议你每月深度维护5-10个关键关系，了解他们的目标和挑战，主动提供价值，这些连接将成为你最重要的机遇来源。'},
+    {t:'风险重构：把风险看成投资',c:'你的风险承担能力还有提升空间。很多人把风险看作损失，但成功者把风险看作投资——你投入的是时间、精力和少量资本，可能获得巨大的回报。建立风险管理框架：设定最大可承受损失，在此范围内大胆行动。真正的风险不是失败，而是因为害怕失败而从不尝试。'}
+  ];}else{mods=[
+    {t:'机遇意识待唤醒：从今天开始转变',c:'你的机遇敏感度目前较低，可能常常感觉机遇属于别人。但这不是命运——这是可以通过系统训练彻底改变的认知和行为模式。研究表明，所谓"幸运"的人并非真的更幸运，而是拥有开放的态度、广泛的人脉、主动的行动和对机遇的高度注意力。这些都是可以培养的。'},
+    {t:'思维转型：从固定型到成长型',c:'机遇敏感度的提升，首先需要思维模式的转型。固定型思维让你相信机遇是天生的、运气决定的；成长型思维让你相信机遇是可以创造和把握的。斯坦福大学心理学家卡罗尔·德韦克的研究证明，成长型思维者在面对挑战时更有韧性，更愿意尝试新事物，长期成就更高。从今天起，刻意培养成长型思维。'},
+    {t:'行动第一步：打破惰性的力量',c:'对你而言，最重要的不是思考机遇，而是行动。行动是打破现状的唯一方式。从最小的行动开始：今天给一个许久未联系的人发一条消息，明天参加一个行业活动，下周尝试一个新技能。每一个小行动都在向你的潜意识证明：你是一个主动的人，机遇是可以创造的。积累足够多的小行动，大机遇自然会出现。'},
+    {t:'人脉启蒙：你的第一个人脉圈',c:'从你身边最近的5个人开始，深度了解他们的目标、挑战和资源。思考你能为他们提供什么价值，然后主动提供。真诚地帮助他人，是建立人脉最可靠的方式。每个月认识1-2个新的、在你目标领域有所成就的人。不要等到"需要的时候"才想到人脉——人脉是在不需要的时候建立的，在需要的时候使用的。'}
+  ];}
+  document.getElementById('analysis').innerHTML=mods.map(m=>`<div class="ana-mod"><h3 class="ana-mod-title">${m.t}</h3><p class="ana-mod-text">${m.c}</p></div>`).join('');
+}
+function renderTheories(){
+  const ts=[
+    {t:'理查德·怀斯曼的幸运研究',d:'英国心理学家怀斯曼在《幸运的秘密》中通过多年研究发现，幸运不是随机的。幸运的人拥有四个关键特质：建立广泛的机遇网络、倾听直觉和本能、对新体验保持开放、以积极的心态面对失败。他的实验证明，通过刻意训练这四个特质，原本"不幸"的人在一个月内幸运感显著提升。机遇从来不是偶然，而是一种可以学习的技能。',s:'Wiseman, R. (2003). The Luck Factor. Miramax Books.'},
+    {t:'彼得·蒂尔的从0到1哲学',d:'蒂尔在《从0到1》中提出，真正的价值来自于创造新事物，而不是复制已有模式。他认为秘密和洞见是创造机遇的关键：那些其他人还不知道、但确实存在的真理。他鼓励用第一性原理思考：不问"别人怎么做"，而问"什么是真实的"。这种颠覆性的思维方式，是在竞争饱和的时代找到蓝海机遇的关键。',s:'Thiel, P. (2014). Zero to One: Notes on Startups, or How to Build the Future.'},
+    {t:'格拉德威尔的连接力量研究',d:'格拉德威尔在《引爆点》中分析了信息和机遇如何在社会网络中传播。他提出了联系人、内行和推销员三种在机遇扩散中关键的人物类型。他的研究揭示，拥有广泛弱连接（松散的熟人网络）比深度强连接（密友圈）往往能带来更多意外机遇。这解释了为什么主动建立多元化人脉、参加不同圈子的活动，能显著增加机遇出现的概率。',s:'Gladwell, M. (2000). The Tipping Point: How Little Things Can Make a Big Difference.'}
+  ];
+  document.getElementById('theories').innerHTML=ts.map(t=>`<div class="theory-item"><h3 class="theory-title">${t.t}</h3><p class="theory-desc">${t.d}</p><p class="theory-src">来源：${t.s}</p></div>`).join('');
+}
+function renderActions(){
+  const acts=[
+    {t:'建立每日机遇扫描习惯',c:'每天花15分钟系统扫描三个维度的机遇信号：行业动态（你所在和相关领域的新趋势）、人际网络（谁在做有趣的事，是否有合作可能）、自身能力（你的哪些能力组合在市场上稀缺）。用笔记本记录你的发现，每周回顾，你会惊讶于机遇无处不在。这个习惯如果坚持半年，你对机遇的感知力将达到新的维度。'},
+    {t:'48小时行动原则',c:'对于任何让你产生兴趣的机遇，必须在48小时内采取一个具体的行动，无论多小。可以是发一封邮件，预约一个对话，阅读相关资料，或者创建一个简单的测试方案。这个原则的目的是打破"考虑-犹豫-错过"的惰性循环。研究表明，超过48小时不行动的想法，被实际执行的概率会骤降到不足5%。快速行动是机遇变现的关键。'},
+    {t:'每月深度拓展一个高价值连接',c:'识别3-5个在你目标领域中有你需要的知识、资源或人脉的人。研究他们的工作和兴趣，找到真实的价值交换点（你能为他们提供什么）。发送一封个性化的邮件或消息，分享对他们有价值的内容，建立连接。不要要求，先给予。每月坚持深度拓展一个高质量连接，一年后你的网络将产生质的飞跃。'},
+    {t:'构建个人知识飞轮',c:'建立一个持续学习和输出的飞轮：每周阅读一本书或深度文章——提炼3个核心洞见——用自己的话输出（写作、分享）——获得反馈——进入下一轮。输出是学习最深刻的方式，同时建立了你的公开影响力，吸引更多机遇。坚持6个月的持续输出，你将建立起明显的知识差异化优势，成为某个领域的思想领袖。'},
+    {t:'每季度进行战略复盘',c:'每三个月进行一次深度复盘：回顾过去3个月错过的机遇（哪些信号没有识别，哪些行动没有采取）、审视当前的目标是否仍然有价值、评估自己的能力组合在市场上的竞争位置、规划下个季度的重点机遇方向。这种系统性的战略复盘，是顶级成功者保持方向感和机遇意识的核心工具。将复盘写成文字，效果比仅仅在脑中思考强10倍。'}
+  ];
+  document.getElementById('actions').innerHTML=acts.map((a,i)=>`<div class="action-item"><h3 class="action-title"><span class="action-num">${i+1}</span>${a.t}</h3><p class="action-text">${a.c}</p></div>`).join('');
+}
+function renderQuote(){
+  const qs=[
+    {t:'"机遇从不拜访那些还没准备好的人——除非他们恰好在正确的地方以正确的心态等待。"',a:'托马斯·爱迪生'},
+    {t:'"你的机遇，藏在你帮助别人解决的问题里。"',a:'未知'},
+    {t:'"运气是准备遇上机会。当一个人的准备没有达到机会的要求，这就是所谓的不幸。"',a:'奥普拉·温弗里'},
+    {t:'"如果机遇敲门，你要先打开门。"',a:'米尔顿·伯尔'}
+  ];
+  const q=qs[Math.floor(Math.random()*qs.length)];
+  document.getElementById('qt-text').textContent=q.t;
+  document.getElementById('qt-author').textContent=`—— ${q.a}`;
+}
+function initParticles(){
+  const canvas=document.getElementById('particles-canvas');if(!canvas)return;
+  const ctx=canvas.getContext('2d');if(!ctx)return;
+  function resize(){canvas.width=window.innerWidth;canvas.height=window.innerHeight;}
+  resize();
+  const ps=Array.from({length:80},()=>({x:Math.random()*canvas.width,y:Math.random()*canvas.height,vx:(Math.random()-.5)*.5,vy:(Math.random()-.5)*.5,r:Math.random()*2.5+.8,c:['#fbbf24','#f59e0b','#fde68a'][Math.floor(Math.random()*3)],a:Math.random()*.5+.3}));
+  function draw(){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    ps.forEach((p,i)=>{
+      p.x+=p.vx;p.y+=p.vy;
+      if(p.x<0||p.x>canvas.width)p.vx*=-1;if(p.y<0||p.y>canvas.height)p.vy*=-1;
+      ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fillStyle=p.c;ctx.globalAlpha=p.a;ctx.fill();ctx.globalAlpha=1;
+      for(let j=i+1;j<ps.length;j++){const q=ps[j],dx=p.x-q.x,dy=p.y-q.y,d=Math.sqrt(dx*dx+dy*dy);if(d<140){ctx.beginPath();ctx.moveTo(p.x,p.y);ctx.lineTo(q.x,q.y);ctx.strokeStyle=p.c;ctx.lineWidth=.5;ctx.globalAlpha=(140-d)/140*.22;ctx.stroke();ctx.globalAlpha=1;}}
+    });
+    requestAnimationFrame(draw);
+  }
+  draw();window.addEventListener('resize',resize);
+}
+document.addEventListener('DOMContentLoaded',initParticles);
+document.getElementById('pw-input').addEventListener('keypress',e=>{if(e.key==='Enter')checkPW();});
+</script>
+</body>
+</html>
